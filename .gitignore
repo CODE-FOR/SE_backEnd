@@ -1,0 +1,33 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+db.sqlite3.bk
+media
+
+# venv #
+venv/
+
+# Visual Studio Code # 
+.vscode/*
+
+# pycharm
+.idea/
+
+# local .sh
+wsb-local-deployment.sh
+wsb-local-test-build.sh
+wsb-local-test-coverage.sh
+
+# migrations
+migrations/
+
+# my script
+script/
+
+# test
+.coverage
+coverage
+test_report
