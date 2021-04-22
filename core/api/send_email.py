@@ -37,9 +37,9 @@ def send_email(email, code):
         code {str} -- check code
     """
 
-    subject = '来自微知灼识的注册邮件'
+    subject = '来自还没起名字的论文解读平台的注册邮件'
 
-    text_content = '''感谢注册微知灼识，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
+    text_content = '''感谢注册还没（后略），如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
 
     template = loader.get_template('send_email.html')
 
@@ -62,9 +62,9 @@ def send_forget(email, code):
         code {str} -- check code
     """
 
-    subject = '来自微知灼识的修改密码确认邮件'
+    subject = '来自（）的修改密码确认邮件'
 
-    text_content = '''感谢使用微知灼识，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
+    text_content = '''感谢使用****，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
 
     template = loader.get_template('send_forget.html')
 

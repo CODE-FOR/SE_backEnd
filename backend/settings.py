@@ -27,6 +27,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 FIXTURE_DIRS = [BASE_DIR + '/core/tests/fixtures']
 
+MIDDLEWARE_CLASSES = [
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CORS_ORIGIN_WHITELIST = (
+        'https://localhost:8080',
+        'http://10.136.242.157:8080'
+)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,6 +48,7 @@ INSTALLED_APPS = [
     'core',
     'rest_framework',
     'django_extensions',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -115,13 +125,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-SERVER_IP = '114.116.29.7'
+# SERVER_IP = '114.116.29.7'
+SERVER_IP = '114.115.215.200'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'mp_am_1@163.com'
-EMAIL_HOST_PASSWORD = 'IIMVRZAGOBNWYKNE'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'kumo41@163.com'
+EMAIL_HOST_PASSWORD = 'DZPWDGKXIMCREZNS'
+EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AUTH_USER_MODEL = 'core.User'
