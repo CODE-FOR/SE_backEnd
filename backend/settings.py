@@ -30,12 +30,23 @@ FIXTURE_DIRS = [BASE_DIR + '/core/tests/fixtures']
 
 MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware'
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-        'http://114.115.215.200:8080',
-        'https://localhost:8080',
-        'http://10.136.242.157:8080'
+    '*'
+)
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'VIEW',
 )
 
 CORS_ALLOW_HEADERS = (
