@@ -1,16 +1,14 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpRequest
-from django.forms import model_to_dict
-from django.core.paginator import Paginator
-from django.core import serializers
+
 from .utils import (failed_api_response, ErrorCode,
                     success_api_response,
                     wrapped_api, response_wrapper)
 import json
-from core.models.micro_evidence import MicroEvidence
+
 from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
-from core.models.micro_knowledge import (JUDGE_STATUS_CHIOCES, JUDGING)
+
 from core.api.auth import jwt_auth
 from core.models.paper import Paper
 

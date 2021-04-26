@@ -59,9 +59,9 @@ class Paper(models.Model):
     def to_hash(self):
         rst = dict()
         tags = list(self.tag_list.values('id', 'name', 'type'))  # dic
-        author = self.get_author  # tuple
+        author = list(self.get_author())  # tuple
         rst.update({
-            "id": self.id,
+            "id": self.pk,
             "created_by": {
                 "id": self.created_by.id,
                 "username": self.created_by.username,
