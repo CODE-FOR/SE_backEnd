@@ -62,8 +62,8 @@ urlpatterns = [
     path('micro-knowledge/<int:id>/judge', MICRO_KNOWLEDGE_JUDGE_API),
 
     # paper apis
-    path('micro-evidence', create_paper),
-    path('micro-evidence/<int:id>', PAPER_API),
+    path('paper', create_paper),
+    path('paper/<int:id>', PAPER_API),
     # path('paper/page/<int:pindex>', MICRO_EVIDENCE_SET_API),
 
     # micro evidence apis
