@@ -176,7 +176,6 @@ def list_micro_evidence(request: HttpRequest, pindex):
         "page_num": paginator.num_pages,
     })
 
-
 MICRO_EVIDENCE_API = wrapped_api({
     'POST': create_micro_evidence,
     'DELETE': delete_micro_evidence,

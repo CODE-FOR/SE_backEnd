@@ -20,7 +20,7 @@ from core.api.fan import list_fans
 from core.api.follower import list_followers
 from core.api.user_icon import USER_ICON_API
 from core.api.notification import (NOTIFICATION_API, NOTIFICATION_SET_API)
-from core.api.project import create_project,PROJECT_API,get_project_list
+from core.api.project import create_project, PROJECT_API, get_project_list
 from core.api.recommend import recommend
 from core.api.topic import (TOPIC_API, create_topic, get_topic_list)
 from core.api.discussion import (create_discussion, delete_discussion, get_discussion, get_discussion_list)
@@ -29,9 +29,11 @@ from core.api.timeline import (TIMELINE_API, create_timeline, get_timeline_list)
 from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_mk_list)
 from core.api.word_cloud import word_cloud
 
+from core.api.paper import create_paper, delete_paper, get_paper, PAPER_API
+
 urlpatterns = [
-    
-    #user apis
+
+    # user apis
     path('token-auth', obtain_jwt_token),
     path('token-refresh', refresh_jwt_token),
     path('user/create', CREATE_USER_API),
@@ -59,6 +61,11 @@ urlpatterns = [
     path('favorites/page/<int:pindex>', FAVORITES_SET_API),
     path('micro-knowledge/<int:id>/judge', MICRO_KNOWLEDGE_JUDGE_API),
 
+    # paper apis
+    path('micro-evidence', create_paper),
+    path('micro-evidence/<int:id>', PAPER_API),
+    # path('paper/page/<int:pindex>', MICRO_EVIDENCE_SET_API),
+
     # micro evidence apis
     path('micro-evidence', create_micro_evidence),
     path('micro-evidence/<int:id>', MICRO_EVIDENCE_API),
@@ -75,51 +82,49 @@ urlpatterns = [
     # list posts
     path('post/<int:uid>', list_posts),
 
-    #list fans
+    # list fans
     path('fan/<int:uid>', list_fans),
 
-    #list follower
+    # list follower
     path('follower/<int:uid>', list_followers),
 
     # notifications
     path('notification', NOTIFICATION_API),
     path('notification/page/<int:pindex>', NOTIFICATION_SET_API),
 
-    #project
+    # project
     path('project/create', create_project),
     path('project/<int:id>', PROJECT_API),
     path('project', get_project_list),
 
-    #topic
+    # topic
     path('topic/create', create_topic),
     path('topic/<int:id>', TOPIC_API),
     path('topic', get_topic_list),
-    
-    #discussion
+
+    # discussion
     path('discussion/create', create_discussion),
     path('discussion/delete', delete_discussion),
     path('discussion/<int:id>', get_discussion),
     path('discussion', get_discussion_list),
-    
-    
+
     ##timeline
-    #path('timeline/create', create_timeline),
-    #path('timeline/<int:id>', TIMELINE_API),
-    #path('timeline', get_timeline_list),
-    
-    #project mk
+    # path('timeline/create', create_timeline),
+    # path('timeline/<int:id>', TIMELINE_API),
+    # path('timeline', get_timeline_list),
+
+    # project mk
     path('project/micro-knowledge/create', create_project_mk),
     path('project/micro-knowledge/<int:id>', PROJECT_MK_API),
     path('project/micro-knowledge', get_project_mk_list),
-    
-    #test
+
+    # test
     path('recommend', recommend),
 
     # images
     path('image', IMAGE_API),
     path('image/page/<pindex: int>', IMAGE_SET_API),
 
-    #word cloud
+    # word cloud
     path('cloud', word_cloud),
 ]
-
