@@ -48,6 +48,7 @@ def create_paper(request: HttpRequest):
 
     paper.add_author(params.get("author"))
 
+
     # for recommend
     # tags = user.user_tags[1:-1]
     # tags_arr: list = [0] * 70 if tags == '' else [int(s) for s in tags.split(',')]

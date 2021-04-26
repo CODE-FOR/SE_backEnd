@@ -32,6 +32,7 @@ MIDDLEWARE_CLASSES = [
 ]
 
 CORS_ORIGIN_WHITELIST = (
+        'http://114.115.215.200:8080',
         'https://localhost:8080',
         'http://10.136.242.157:8080'
 )
