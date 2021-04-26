@@ -49,9 +49,8 @@ class Paper(models.Model):
     def get_author(self):
         return self.authors.values_list('name')
 
-    def add_author(self, authors: str):
-        author_list = authors.split()
-        for author in author_list:
+    def add_author(self, authors):
+        for author in authors:
             author_model = Paper_author()
             author_model.author = author
             author_model.paper = self
