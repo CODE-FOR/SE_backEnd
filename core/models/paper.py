@@ -58,23 +58,25 @@ class Paper(models.Model):
 
     def to_hash(self):
         rst = dict()
-        tags = list(self.tag_list.values('id', 'name', 'type'))
-        author = self.get_author
+        tags = list(self.tag_list.values('id', 'name', 'type'))  # dic
+        author = self.get_author  # tuple
         rst.update({
             "id": self.id,
             "created_by": {
                 "id": self.created_by.id,
                 "username": self.created_by.username,
             },
-            "tags": tags,
+            "tags": tags,   # dic
             "abstract": self.abstract,
             "source": self.source,
             "published_year": self.published_year,
             "created_at": self.created_at,
-            "author": author,
+            "author": author,   # tuple
             "title": self.title
         })
         return rst
+
+
 '''
     def favorites_num(self):
         return self.favorites.values().count()

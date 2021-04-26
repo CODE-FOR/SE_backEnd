@@ -27,6 +27,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 FIXTURE_DIRS = [BASE_DIR + '/core/tests/fixtures']
 
+'''
 MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
 ]
@@ -36,7 +37,7 @@ CORS_ORIGIN_WHITELIST = (
         'https://localhost:8080',
         'http://10.136.242.157:8080'
 )
-
+'''
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,7 +50,7 @@ INSTALLED_APPS = [
     'core',
     'rest_framework',
     'django_extensions',
-    'corsheaders',
+    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
