@@ -27,7 +27,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 FIXTURE_DIRS = [BASE_DIR + '/core/tests/fixtures']
 
-'''
+
 MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
 ]
@@ -37,7 +37,23 @@ CORS_ORIGIN_WHITELIST = (
         'https://localhost:8080',
         'http://10.136.242.157:8080'
 )
-'''
+
+CORS_ALLOW_HEADERS = (
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+    'x-token',
+    'X-Token',
+)
+
 # Application definition
 
 INSTALLED_APPS = [
