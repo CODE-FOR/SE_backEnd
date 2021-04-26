@@ -44,10 +44,9 @@ def create_paper(request: HttpRequest):
     paper.published_year = params.get("published_year")
     paper.abstract = params.get("abstract")
     paper.created_by = user
+    paper.save()
 
     paper.add_author(params.get("author"))
-
-    paper.save()
 
     # for recommend
     # tags = user.user_tags[1:-1]

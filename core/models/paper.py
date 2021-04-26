@@ -52,7 +52,7 @@ class Paper(models.Model):
     def add_author(self, authors):
         for author in authors:
             author_model = Paper_author()
-            author_model.author = author
+            author_model.name = author
             author_model.paper = self
             author_model.save()
 
