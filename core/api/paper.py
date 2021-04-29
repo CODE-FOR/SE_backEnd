@@ -10,7 +10,7 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_up
+from core.models.paper import Paper, get_up, get_title_and_id
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation
 
@@ -175,6 +175,17 @@ def list_paper_page(request: HttpRequest, pindex):
         "page_num": paginator.num_pages,
         "paper_num": paper_num,
     })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def get_paper_title(request: HttpRequest):
+    titles = get_title_and_id()
+    return success_api_response({
+        "titles": titles
+    })
+
 
 
 PAPER_API = wrapped_api({

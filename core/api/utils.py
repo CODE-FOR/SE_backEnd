@@ -18,6 +18,7 @@ class ErrorCode(Enum):
     REFUSE_ACCESS = 403
     ITEM_ALREADY_EXISTS = 409
     SERVER_ERROR = 500
+    ID_NOT_EXISTS = 555
 
 
 def _api_response(success, data) -> dict:

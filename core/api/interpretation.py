@@ -27,6 +27,7 @@ def create_interpretation(request: HttpRequest):
         title: string
         content: string
         paper_id: int
+        tags: list of tag | tag: {name, type}
     :return:
         interpretation_id
     """
@@ -40,12 +41,25 @@ def create_interpretation(request: HttpRequest):
     interpretation.content = params.get("content")
     paper = get_by_id(params.get("paper_id"))
     if paper is None:
-        return failed_api_response(ErrorCode.ITEM_ALREADY_EXISTS, "paper id doesn't exist!")
+        return failed_api_response(ErrorCode.ID_NOT_EXISTS, "paper id doesn't exist!")
     interpretation.paper = paper
     interpretation.created_by = user
     interpretation.save()
 
+    for tag in params.get("tags"):
+        tag_name = tag.get('name', None)
+        tag_type = tag.get('type', None)
+        if tag_name is None:
+            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "tag params miss argument: tag_name.")
+        if tag_type is None:
+            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "tag params miss argument: tag_type.")
+        if Tag.objects.filter(type=tag_type).filter(name=tag_name).exists():
+            tag = Tag.objects.filter(type=tag_type).filter(name=tag_name).first()
+        else:
+            tag = Tag(name=tag_name, type=tag_type)
+            tag.save()
+        interpretation.tag_list.add(tag)
+
     return success_api_response({
         "id": interpretation.id
     })
-

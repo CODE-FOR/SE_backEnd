@@ -89,6 +89,21 @@ def get_by_id(pid):
     return None
 
 
+# 获取论文标题和id，供列表用
+def get_title_and_id():
+    re = []
+    papers = Paper.objects.all()
+    for paper in papers:
+        rst = dict()
+        rst.update({
+            'title': paper.title,
+            'id': paper.pk,
+        })
+        re.append(rst)
+    return re
+
+
+# 按置顶+时间倒序获取paper
 def get_up():
     papers = Paper.objects.all().order_by('-is_up', '-created_at')
     '''
