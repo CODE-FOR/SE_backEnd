@@ -28,7 +28,16 @@ class User(AbstractUser):
 
     class Meta(AbstractUser.Meta):
         pass
-    
+
+
+    def to_hash(self):
+        rst = dict()
+        rst.update({
+            "id": self.id,
+            "username": self.username,
+        })
+        return rst
+
     def simple_to_dict(self):
         return {
             'nick_name': self.nick_name,

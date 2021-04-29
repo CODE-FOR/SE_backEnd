@@ -3,6 +3,7 @@
 from django.db import models
 from .micro_knowledge import MicroKnowledge, MICRO_EVIDENCE
 from .paper import Paper
+from .user import User
 
 
 class Interpretation(models.Model):
@@ -11,33 +12,26 @@ class Interpretation(models.Model):
     Fields:
         - 
     """
-    citation = models.CharField(max_length=200)
-    source = models.URLField()
-    published_year = models.IntegerField()
+
+    paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='related_interpretation')
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='create_paper')
+    title = models.CharField(max_length=100)
+
+    source = models.CharField(max_length=300)
+
+    is_deleted = models.BooleanField(default=False)
+    is_up = models.BooleanField(default=False)
 
     def to_hash(self):
         rst = dict()
-        tags = list(self.tag_list.values('id', 'name', 'type'))
         rst.update({
             "id": self.id,
-            "created_by": {
-                "id": self.created_by.id,
-                "icon": str(self.created_by.icon),
-                "username": self.created_by.username,
-                "institution": self.created_by.institution,
-            },
-            "tags": tags,
-            "content": self.content,
-            "judge_status": self.judge_status,
-            "citation": self.citation,
+            "created_by": self.created_by.to_hash()
+            "paper": self.paper.to_hash(),
+            "is_deleted": self.is_deleted,
             "source": self.source,
-            "published_year": self.published_year,
             "created_at": self.created_at,
-            "favor_num": self.favorites_num(),
-            "like_num": self.like_num(),
             "type": self.micro_type(),
         })
         return rst
-
-    def micro_type(self):
-        return MICRO_EVIDENCE

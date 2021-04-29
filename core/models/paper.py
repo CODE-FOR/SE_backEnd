@@ -64,10 +64,7 @@ class Paper(models.Model):
         author = list(self.get_author())  # tuple
         rst.update({
             "id": self.pk,
-            "created_by": {
-                "id": self.created_by.id,
-                "username": self.created_by.username,
-            },
+            "created_by": self.created_by.to_hash(),
             "tags": tags,  # dic
             "abstract": self.abstract,
             "source": self.source,
