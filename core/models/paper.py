@@ -66,15 +66,34 @@ class Paper(models.Model):
                 "id": self.created_by.id,
                 "username": self.created_by.username,
             },
-            "tags": tags,   # dic
+            "tags": tags,  # dic
             "abstract": self.abstract,
             "source": self.source,
             "published_year": self.published_year,
             "created_at": self.created_at,
-            "author": author,   # tuple
+            "author": author,  # tuple
             "title": self.title
         })
         return rst
+
+
+def get_page(n=1):
+    l = (n - 1) * 10
+    r = n * 10
+    papers = Paper.objects.all().order_by('-created_at')[l:r]
+    '''
+    if tags:
+        for tag_str in tags:
+            tag_list = Tag.objects.filter(name__icontains=tag_str)
+            qs_tag = cls.objects.none()
+            for tag in tag_list:
+                qs_tag = qs_tag | cls.objects.filter(tag_list__id__contains=tag.id)
+            qs = qs & qs_tag
+    if keywords:
+        for keyword in keywords:
+            qs = qs & cls.objects.filter(content__icontains=keyword)
+    '''
+    return papers
 
 
 '''
