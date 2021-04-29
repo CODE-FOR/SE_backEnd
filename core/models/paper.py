@@ -34,6 +34,7 @@ class Paper(models.Model):
         - tag_list: a tag list of the paper
         - paper_link: url of the paper
         - is_deleted: delete symbol
+        - is_up: is up
     """
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='create_paper')
@@ -45,6 +46,7 @@ class Paper(models.Model):
     # topic_list = models.ManyToManyField(to=Topic, related_name='topic_to_paper')
     tag_list = models.ManyToManyField(to=Tag, related_name='tag_to_paper')
     is_deleted = models.BooleanField(default=False)
+    is_up = models.BooleanField(default=False)
 
     def get_author(self):
         return self.authors.values_list('name')
@@ -77,10 +79,8 @@ class Paper(models.Model):
         return rst
 
 
-def get_page(n=1):
-    l = (n - 1) * 10
-    r = n * 10
-    papers = Paper.objects.all().order_by('-created_at')[l:r]
+def get_up():
+    papers = Paper.objects.all().order_by('-is_up', '-created_at')
     '''
     if tags:
         for tag_str in tags:
