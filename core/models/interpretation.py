@@ -15,7 +15,7 @@ class Interpretation(models.Model):
 
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='related_interpretation')
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='create_paper')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='create_interpretation')
     title = models.CharField(max_length=100)
 
     content = models.CharField(max_length=4096)
