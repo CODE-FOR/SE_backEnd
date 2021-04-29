@@ -30,6 +30,7 @@ from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_
 from core.api.word_cloud import word_cloud
 
 from core.api.paper import create_paper, delete_paper, get_signal_paper, PAPER_API, list_paper_page
+from core.api.interpretation import create_interpretation
 
 urlpatterns = [
 
@@ -65,6 +66,9 @@ urlpatterns = [
     path('paper', create_paper),
     path('paper/<int:id>', PAPER_API),
     path('paper/page/<int:pindex>', list_paper_page),
+
+    # interpretation apis
+    path('interpretation/create', create_interpretation),
 
     # micro evidence apis
     path('micro-evidence', create_micro_evidence),

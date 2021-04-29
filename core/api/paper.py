@@ -12,6 +12,7 @@ from core.models.user import User
 from core.api.auth import jwt_auth
 from core.models.paper import Paper, get_up
 from django.core.paginator import Paginator
+from core.models.interpretation import Interpretation
 
 
 # paper curd
@@ -48,7 +49,6 @@ def create_paper(request: HttpRequest):
     paper.save()
 
     paper.add_author(params.get("author"))
-
 
     # for recommend
     # tags = user.user_tags[1:-1]
@@ -125,10 +125,14 @@ def get_signal_paper(request: HttpRequest, id: int):
     p = request.user
     paper = Paper.objects.get(pk=id)
     rst = paper.to_hash()
-    # rst.update({)
-    #     "is_like": micro_evidence.is_like(p.id,
-    #     "is_favor": micro_evidence.is_favor(p.id),
-    # })
+
+    interpretations = paper.get_related_interpretation()
+
+    rst.update({
+        "interpretations": interpretations,
+        #     "is_like": micro_evidence.is_like(p.id,
+        #     "is_favor": micro_evidence.is_favor(p.id),
+    })
     return success_api_response(rst)
 
 

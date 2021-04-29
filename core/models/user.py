@@ -29,7 +29,6 @@ class User(AbstractUser):
     class Meta(AbstractUser.Meta):
         pass
 
-
     def to_hash(self):
         rst = dict()
         rst.update({

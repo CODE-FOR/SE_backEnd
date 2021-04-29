@@ -75,6 +75,19 @@ class Paper(models.Model):
         })
         return rst
 
+    def get_related_interpretation(self):
+        interpretations = []
+        inters = self.related_interpretation.all()
+        for inter in inters:
+            interpretations.append(inter.to_hash_for_paper())
+        return interpretations
+
+
+def get_by_id(pid):
+    if Paper.objects.filter(pk=pid).exists():
+        return Paper.objects.filter(pk=pid).first()
+    return None
+
 
 def get_up():
     papers = Paper.objects.all().order_by('-is_up', '-created_at')
