@@ -162,12 +162,6 @@ def list_paper_page(request: HttpRequest, pindex):
         # })
         page_json.append(rst)
     return success_api_response({
-        """
-        papers: list of papers(this page only)
-        has_next/has_previous: True/False
-        number: page number now
-        page_num: total pages of the papers
-        """
         "papers": page_json,
         "has_next": paper.has_next(),
         "has_previous": paper.has_previous(),
