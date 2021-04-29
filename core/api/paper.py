@@ -10,7 +10,7 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_page
+from core.models.paper import Paper, get_up
 from django.core.paginator import Paginator
 
 
@@ -114,7 +114,7 @@ def delete_paper(request: HttpRequest, id: int):
 @response_wrapper
 @jwt_auth()
 @require_http_methods('GET')
-def get_paper(request: HttpRequest, id: int):
+def get_signal_paper(request: HttpRequest, id: int):
     """ get micro evidence information
     :param request:
     :param id: primary key
@@ -143,7 +143,7 @@ def list_paper_page(request: HttpRequest, pindex):
     """
     params = dict(request.GET)
 
-    papers = Paper.objects.all().order_by('-created_at')
+    papers = get_up()
 
     p = request.user
     if params.get('user_id'):
@@ -180,5 +180,5 @@ PAPER_API = wrapped_api({
     'POST': create_paper,
     'DELETE': delete_paper,
     # 'PUT': update_micro_evidence,
-    'GET': get_paper
+    'GET': get_signal_paper
 })
