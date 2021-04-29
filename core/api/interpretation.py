@@ -63,3 +63,27 @@ def create_interpretation(request: HttpRequest):
     return success_api_response({
         "id": interpretation.id
     })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def get_interpretation_by_id(request: HttpRequest, id: int):
+    """ get micro evidence information
+    :param request:
+    :param id: primary key
+    :return:
+    """
+    p = request.user
+    interpretation = Interpretation.objects.get(pk=id)
+    rst = interpretation.to_hash()
+
+    return success_api_response(rst)
+
+
+INTERPRETATION_API = wrapped_api({
+    # 'POST': create_paper,
+    # 'DELETE': delete_paper,
+    # 'PUT': update_micro_evidence,
+    'GET': get_interpretation_by_id
+})

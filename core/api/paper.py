@@ -187,7 +187,6 @@ def get_paper_title(request: HttpRequest):
     })
 
 
-
 PAPER_API = wrapped_api({
     'POST': create_paper,
     'DELETE': delete_paper,
