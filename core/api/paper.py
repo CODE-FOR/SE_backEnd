@@ -25,7 +25,7 @@ def create_paper(request: HttpRequest):
     :param request:
         title: string
         abstract: string
-        author: list of string, divided by SPACE
+        author: list of string
         source: url
         published_year: int
         topic: list of string
@@ -36,6 +36,8 @@ def create_paper(request: HttpRequest):
     """
     params = json.loads(request.body.decode())
     user = request.user
+    if params.get('user_id'):
+        user = User.objects.get(pk=params.get('user_id'))
 
     paper = Paper()
     paper.title = params.get("title")
@@ -123,8 +125,8 @@ def get_signal_paper(request: HttpRequest, id: int):
     p = request.user
     paper = Paper.objects.get(pk=id)
     rst = paper.to_hash()
-    # rst.update({
-    #     "is_like": micro_evidence.is_like(p.id),
+    # rst.update({)
+    #     "is_like": micro_evidence.is_like(p.id,
     #     "is_favor": micro_evidence.is_favor(p.id),
     # })
     return success_api_response(rst)
@@ -144,13 +146,13 @@ def list_paper_page(request: HttpRequest, pindex):
     params = dict(request.GET)
 
     papers = get_up()
-
+    paper_num = Paper.objects.count()
     p = request.user
     if params.get('user_id'):
         p = User.objects.get(pk=params.get('user_id'))
-    num_per_page = 10
-    # if params.get('num_per_page', None):
-    #     num_per_page = int(params.get('num_per_page', None))
+    num_per_page = 5
+    if params.get('num_per_page', None):
+        num_per_page = int(params.get('num_per_page', None))
     paginator = Paginator(papers, num_per_page)
     paper = paginator.page(pindex)
     page_json = []
@@ -167,6 +169,7 @@ def list_paper_page(request: HttpRequest, pindex):
         "has_previous": paper.has_previous(),
         "number": paper.number,
         "page_num": paginator.num_pages,
+        "paper_num": paper_num,
     })
 
 
