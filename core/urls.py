@@ -29,7 +29,8 @@ from core.api.timeline import (TIMELINE_API, create_timeline, get_timeline_list)
 from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_mk_list)
 from core.api.word_cloud import word_cloud
 
-from core.api.paper import create_paper, delete_paper, get_signal_paper, PAPER_API, list_paper_page, get_paper_title
+from core.api.paper import create_paper, delete_paper, get_signal_paper, PAPER_API, list_paper_page, get_paper_title, \
+    load_in_paper
 from core.api.interpretation import create_interpretation, INTERPRETATION_API
 
 urlpatterns = [
@@ -67,6 +68,7 @@ urlpatterns = [
     path('paper/<int:id>', PAPER_API),
     path('paper/page/<int:pindex>', list_paper_page),
     path('paper/titles', get_paper_title),
+    path('paper/load', load_in_paper),
 
     # interpretation apis
     path('interpretation/create', create_interpretation),

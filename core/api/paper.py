@@ -193,3 +193,54 @@ PAPER_API = wrapped_api({
     # 'PUT': update_micro_evidence,
     'GET': get_signal_paper
 })
+
+
+def load_in_paper(request: HttpRequest):
+    """
+    :param request:
+        title: string
+        abstract: string
+        author: list of string
+        source: url
+        published_year: int
+        topic: list of string
+        tags: list of string
+
+    :return:
+        paper_id
+    """
+    params = json.loads(request.body.decode())
+    user = request.user
+    if params.get('user_id'):
+        user = User.objects.get(pk=params.get('user_id'))
+
+    paper = Paper()
+    paper.title = params.get("title")
+    paper.source = params.get("source")
+    paper.published_year = params.get("published_year")
+    paper.abstract = params.get("abstract")
+    paper.created_by = user
+    paper.save()
+
+    paper.add_author(params.get("author"))
+
+
+    for tag in params.get("tags"):
+        tag_name = tag.get('name', None)
+        tag_type = tag.get('type', None)
+        if tag_name is None:
+            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "tag params miss argument: tag_name.")
+        if tag_type is None:
+            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "tag params miss argument: tag_type.")
+        if Tag.objects.filter(type=TAG).filter(name=tag_name).exists():
+            tag = Tag.objects.filter(type=TAG).filter(name=tag_name).first()
+        elif Tag.objects.filter(type=KEYWORD).filter(name=tag_name).exists():
+            tag = Tag.objects.filter(type=KEYWORD).filter(name=tag_name).first()
+        else:
+            tag = Tag(name=tag_name, type=tag_type)
+            tag.save()
+        paper.tag_list.add(tag)
+
+    return success_api_response({
+        "id": paper.id
+    })
