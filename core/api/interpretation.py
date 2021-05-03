@@ -39,7 +39,7 @@ def create_interpretation(request: HttpRequest):
     interpretation = Interpretation()
     interpretation.title = params.get("title")
     interpretation.content = params.get("content")
-    paper = get_by_id(params.get("paper_id"))
+    paper = get_paper_by_id(params.get("paper_id"))
     if paper is None:
         return failed_api_response(ErrorCode.ID_NOT_EXISTS, "paper id doesn't exist!")
     interpretation.paper = paper
