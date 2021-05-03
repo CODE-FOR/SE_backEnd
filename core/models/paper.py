@@ -83,14 +83,14 @@ class Paper(models.Model):
         return interpretations
 
 
-def get_by_id(pid):
+def get_paper_by_id(pid):
     if Paper.objects.filter(pk=pid).exists():
         return Paper.objects.filter(pk=pid).first()
     return None
 
 
 # 获取论文标题和id，供列表用
-def get_title_and_id():
+def get_paper_title_and_id():
     re = []
     papers = Paper.objects.all()
     for paper in papers:
@@ -104,7 +104,7 @@ def get_title_and_id():
 
 
 # 按置顶+时间倒序获取paper
-def get_up():
+def get_paper_ordered_dec():
     papers = Paper.objects.all().order_by('-is_up', '-created_at')
     '''
     if tags:

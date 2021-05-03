@@ -52,3 +52,9 @@ class Interpretation(models.Model):
             "created_at": self.created_at,
         })
         return rst
+
+
+# 按置顶+时间倒序获取paper
+def get_interpretation_ordered():
+    interpretations = Interpretation.objects.all().order_by('-created_at')
+    return interpretations

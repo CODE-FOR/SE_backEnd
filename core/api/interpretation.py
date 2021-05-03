@@ -10,9 +10,9 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_up, get_by_id
+from core.models.paper import Paper, get_paper_ordered_dec, get_paper_by_id
 from django.core.paginator import Paginator
-from core.models.interpretation import Interpretation
+from core.models.interpretation import Interpretation, get_interpretation_ordered
 
 
 # interpretation curd
@@ -79,6 +79,47 @@ def get_interpretation_by_id(request: HttpRequest, id: int):
     rst = interpretation.to_hash()
 
     return success_api_response(rst)
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def list_interpretation_page(request: HttpRequest, pindex):
+    """
+    get a page as order in time
+    :param request:
+        user_id: request user id
+    :param pindex: page index
+    :return:
+    """
+    params = dict(request.GET)
+
+    interpretations = get_interpretation_ordered()
+    interpretation_num = Interpretation.objects.count()
+    p = request.user
+    if params.get('user_id'):
+        p = User.objects.get(pk=params.get('user_id'))
+    num_per_page = 5
+    if params.get('num_per_page', None):
+        num_per_page = int(params.get('num_per_page', None))
+    paginator = Paginator(interpretations, num_per_page)
+    interpretation = paginator.page(pindex)
+    page_json = []
+    for item in interpretation.object_list:
+        rst = item.to_hash()
+        # rst.update({
+        #     "is_like": item.is_like(p.id),
+        #     "is_favor": item.is_favor(p.id),
+        # })
+        page_json.append(rst)
+    return success_api_response({
+        "interpretations": page_json,   # list of interpretation
+        "has_next": interpretation.has_next(),
+        "has_previous": interpretation.has_previous(),
+        "page_now": interpretation.number,    # total
+        "page_total": paginator.num_pages,
+        "interpretation_total": interpretation_num,  # total amount of inter
+    })
 
 
 INTERPRETATION_API = wrapped_api({

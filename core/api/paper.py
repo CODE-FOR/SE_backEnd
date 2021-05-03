@@ -10,7 +10,7 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_up, get_title_and_id
+from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation
 
@@ -149,7 +149,7 @@ def list_paper_page(request: HttpRequest, pindex):
     """
     params = dict(request.GET)
 
-    papers = get_up()
+    papers = get_paper_ordered_dec()
     paper_num = Paper.objects.count()
     p = request.user
     if params.get('user_id'):
@@ -172,7 +172,7 @@ def list_paper_page(request: HttpRequest, pindex):
         "has_next": paper.has_next(),
         "has_previous": paper.has_previous(),
         "number": paper.number,
-        "page_num": paginator.num_pages,
+        "page_num": paginator.num_pages,    # total
         "paper_num": paper_num,
     })
 
@@ -181,7 +181,7 @@ def list_paper_page(request: HttpRequest, pindex):
 @jwt_auth()
 @require_http_methods('GET')
 def get_paper_title(request: HttpRequest):
-    titles = get_title_and_id()
+    titles = get_paper_title_and_id()
     return success_api_response({
         "titles": titles
     })
