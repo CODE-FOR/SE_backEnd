@@ -74,7 +74,7 @@ urlpatterns = [
     path('interpretation/page/<int:pindex>', list_interpretation_page),
 
     # search apis
-    path('search/page/<int:pindex>'),
+    # path('search/page/<int:pindex>'),
 
     # micro evidence apis
     path('micro-evidence', create_micro_evidence),
