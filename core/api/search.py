@@ -35,6 +35,8 @@ def search_by_tag(request: HttpRequest, pindex):
     :param pindex: page index
     :return:
     """
+    p = request.user
+
     cls = type
     params = dict(request.GET)
     is_paper = params.get('paper')
@@ -68,7 +70,7 @@ def search_by_tag(request: HttpRequest, pindex):
     result = paginator.page(pindex)
     page_json = []
     for item in result.object_list:
-        rst = item.to_hash()
+        rst = item.to_hash(p)
         # rst.update({
         #     "is_like": item.is_like(p.id),
         #     "is_favor": item.is_favor(p.id),

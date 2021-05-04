@@ -68,6 +68,39 @@ def create_interpretation(request: HttpRequest):
 @response_wrapper
 @jwt_auth()
 @require_http_methods('GET')
+def like_interpretation(request: HttpRequest, id: int):
+    """ get micro evidence information
+    :param request:
+    :param id: primary key
+    :return:
+    """
+    p = request.user
+    interpretation = Interpretation.objects.get(pk=id)
+
+    interpretation.be_liked(p)
+
+    return success_api_response({})
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def collect_interpretation(request: HttpRequest, id: int):
+    """ get micro evidence information
+    :param request:
+    :param id: primary key
+    :return:
+    """
+    p = request.user
+    interpretation = Interpretation.objects.get(pk=id)
+
+    interpretation.be_collected(p)
+
+    return success_api_response({})
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
 def get_interpretation_by_id(request: HttpRequest, id: int):
     """ get micro evidence information
     :param request:
@@ -76,7 +109,7 @@ def get_interpretation_by_id(request: HttpRequest, id: int):
     """
     p = request.user
     interpretation = Interpretation.objects.get(pk=id)
-    rst = interpretation.to_hash()
+    rst = interpretation.to_hash(p)
 
     return success_api_response(rst)
 
@@ -106,7 +139,7 @@ def list_interpretation_page(request: HttpRequest, pindex):
     interpretation = paginator.page(pindex)
     page_json = []
     for item in interpretation.object_list:
-        rst = item.to_hash()
+        rst = item.to_hash(p)
         # rst.update({
         #     "is_like": item.is_like(p.id),
         #     "is_favor": item.is_favor(p.id),

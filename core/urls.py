@@ -29,8 +29,10 @@ from core.api.timeline import (TIMELINE_API, create_timeline, get_timeline_list)
 from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_mk_list)
 from core.api.word_cloud import word_cloud
 
-from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title
-from core.api.interpretation import create_interpretation, INTERPRETATION_API, list_interpretation_page
+from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title, \
+    like_paper, collect_paper
+from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
+    list_interpretation_page, like_interpretation, collect_interpretation
 from core.api.search import search_by_tag
 
 urlpatterns = [
@@ -68,11 +70,17 @@ urlpatterns = [
     path('paper/<int:id>', PAPER_API),
     path('paper/page/<int:pindex>', list_paper_page),
     path('paper/titles', get_paper_title),
+    path('paper/<int:id>/like', like_paper),
+    path('paper/<int:id>/collect', collect_paper),
 
     # interpretation apis
     path('interpretation/create', create_interpretation),
     path('interpretation/<int:id>', INTERPRETATION_API),
     path('interpretation/page/<int:pindex>', list_interpretation_page),
+    path('interpretation/<int:id>/like', like_interpretation),
+    path('interpretation/<int:id>/collect', collect_interpretation),
+
+    #
 
     # search apis
     path('search/page/<int:pindex>', search_by_tag),

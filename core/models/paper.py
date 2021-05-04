@@ -48,6 +48,9 @@ class Paper(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_up = models.BooleanField(default=False)
 
+    like_list = models.ManyToManyField(to='User', related_name='like_paper')
+    collect_list = models.ManyToManyField(to='User', related_name='collect_paper')
+
     def get_author(self):
         return self.authors.values_list('name')
 
@@ -58,7 +61,31 @@ class Paper(models.Model):
             author_model.paper = self
             author_model.save()
 
-    def to_hash(self):
+    def be_liked(self, user):
+        if self.like_list.filter(user=user):
+            self.like_list.remove(user)
+        self.like_list.add(user)
+
+    def be_collected(self, user):
+        if self.collect_list.filter(user=user):
+            self.collect_list.remove(user)
+        self.collect_list.add(user)
+
+    def like_num(self):
+        return self.like_list.count()
+
+    def collect_num(self):
+        return self.collect_list.count()
+
+    def is_like(self, user):
+        return self.like_list.filter(id=user).exists()
+
+    def is_collect(self, user):
+        return self.collect_list.filter(id=user).exists()
+
+    def to_hash(self, user):
+        if hasattr(user, 'id'):
+            user = user.id
         rst = dict()
         tags = list(self.tag_list.values('id', 'name', 'type'))  # dic
         author = list(self.get_author())  # tuple
@@ -71,15 +98,19 @@ class Paper(models.Model):
             "published_year": self.published_year,
             "created_at": self.created_at,
             "author": author,  # tuple
-            "title": self.title
+            "title": self.title,
+            "like_num": self.like_num(),
+            "collect_num": self.collect_num(),
+            "is_like": self.is_like(user),
+            "is_collect": self.is_collect(user),
         })
         return rst
 
-    def get_related_interpretation(self):
+    def get_related_interpretation(self, user):
         interpretations = []
         inters = self.related_interpretation.all()
         for inter in inters:
-            interpretations.append(inter.to_hash_for_paper())
+            interpretations.append(inter.to_hash_for_paper(user))
         return interpretations
 
 

@@ -124,9 +124,9 @@ def get_signal_paper(request: HttpRequest, id: int):
     """
     p = request.user
     paper = Paper.objects.get(pk=id)
-    rst = paper.to_hash()
+    rst = paper.to_hash(p)
 
-    interpretations = paper.get_related_interpretation()
+    interpretations = paper.get_related_interpretation(p)
 
     rst.update({
         "interpretations": interpretations,
@@ -134,6 +134,40 @@ def get_signal_paper(request: HttpRequest, id: int):
         #     "is_favor": micro_evidence.is_favor(p.id),
     })
     return success_api_response(rst)
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def like_paper(request: HttpRequest, id: int):
+    """ get micro evidence information
+    :param request:
+    :param id: primary key
+    :return:
+    """
+    p = request.user
+    paper = Paper.objects.get(pk=id)
+
+    paper.be_liked(p)
+
+    return success_api_response({})
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def collect_paper(request: HttpRequest, id: int):
+    """ get micro evidence information
+    :param request:
+    :param id: primary key
+    :return:
+    """
+    p = request.user
+    paper = Paper.objects.get(pk=id)
+
+    paper.be_collected(p)
+
+    return success_api_response({})
 
 
 @response_wrapper
@@ -161,7 +195,7 @@ def list_paper_page(request: HttpRequest, pindex):
     paper = paginator.page(pindex)
     page_json = []
     for item in paper.object_list:
-        rst = item.to_hash()
+        rst = item.to_hash(p)
         # rst.update({
         #     "is_like": item.is_like(p.id),
         #     "is_favor": item.is_favor(p.id),
