@@ -40,13 +40,6 @@ def search_by_tag(request: HttpRequest, pindex):
     cls = type
     params = request.GET.dict()
 
-    # print(params.get('pindx'))
-    # print(params.get('interpretation'))
-    # print(params.get('paper'))
-    # print(request.GET.items())
-    # print(request.GET.get('pindx'))
-
-
     is_paper = params.get('paper')
     is_interpretation = params.get('interpretation')
     pindex = params.get('pindx')
@@ -58,16 +51,15 @@ def search_by_tag(request: HttpRequest, pindex):
         failed_api_response (ErrorCode.INVALID_REQUEST_ARGS, "both paper and interpretaions is False!")
 
     tags = params.get('tags')
-    print('tags' + str(tags))
+
     if tags and tags is not '':
         tags = tags.split()
-    tag_list = []
-    for tag in tags:
-        tag_list.append(int(tag))
+    else:
+        tags = []
 
     keyword = params.get('keywords')
 
-    items = search_by_keyword_and_tags(cls, tag_list, keyword)
+    items = search_by_keyword_and_tags(cls, tags, keyword)
 
     result_num = items.count()
 
