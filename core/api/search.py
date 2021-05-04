@@ -46,9 +46,9 @@ def search_by_tag(request: HttpRequest, pindex):
     else:
         failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "both paper and interpretaions is False!")
 
-    tags = params.get('tags', None)
+    tags = params.get('tags')[0]
     if tags and tags is not '':
-        tags = tags.split('+')
+        tags = tags.split()
     tag_list = []
     for tag in tags:
         tag_list.append(int(tag))
