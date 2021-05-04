@@ -10,9 +10,10 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_up, get_title_and_id
+from core.models.paper import Paper
 from core.models.interpretation import Interpretation
 from django.core.paginator import Paginator
+from core.api.common import search_by_keyword_and_tags
 
 
 # search
@@ -21,28 +22,51 @@ from django.core.paginator import Paginator
 @response_wrapper
 @jwt_auth()
 @require_http_methods('GET')
-def list_paper_page(request: HttpRequest, pindex):
+def search_by_tag(request: HttpRequest, pindex):
     """
     get a page as order in time
     :param request:
         user_id: request user id
+        pindex: page num
+        keywords: keyword, string, search by this
+        tags: tags, string, in format "id1 + id2"
+        paper: find paper, bool
+        interpretaion: find interpretation, bool
     :param pindex: page index
     :return:
     """
+    cls = type
     params = dict(request.GET)
+    is_paper = params.get('paper')
+    is_interpretation = params.get('interpretation')
+    if is_paper:
+        cls = Paper
+    elif is_interpretation:
+        cls = Interpretation
+    else:
+        failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "both paper and interpretaions is False!")
 
-    papers = get_up()
-    paper_num = Paper.objects.count()
-    p = request.user
-    if params.get('user_id'):
-        p = User.objects.get(pk=params.get('user_id'))
+    tags = params.get('tags', None)
+    if tags and tags is not '':
+        tags = tags.split('+')
+    tag_list = []
+    for tag in tags:
+        tag_list.append(int(tag))
+
+    keyword = params.get('keywords')
+
+    items = search_by_keyword_and_tags(cls, tag_list, keyword)
+
+    result_num = items.count()
+
     num_per_page = 5
     if params.get('num_per_page', None):
         num_per_page = int(params.get('num_per_page', None))
-    paginator = Paginator(papers, num_per_page)
-    paper = paginator.page(pindex)
+
+    paginator = Paginator(items, num_per_page)
+    result = paginator.page(pindex)
     page_json = []
-    for item in paper.object_list:
+    for item in result.object_list:
         rst = item.to_hash()
         # rst.update({
         #     "is_like": item.is_like(p.id),
@@ -50,10 +74,6 @@ def list_paper_page(request: HttpRequest, pindex):
         # })
         page_json.append(rst)
     return success_api_response({
-        "papers": page_json,
-        "has_next": paper.has_next(),
-        "has_previous": paper.has_previous(),
-        "number": paper.number,
-        "page_num": paginator.num_pages,
-        "paper_num": paper_num,
+        "total_res": result_num,
+        "res": page_json,
     })

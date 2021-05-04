@@ -31,6 +31,7 @@ from core.api.word_cloud import word_cloud
 
 from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title
 from core.api.interpretation import create_interpretation, INTERPRETATION_API, list_interpretation_page
+from core.api.search import search_by_tag
 
 urlpatterns = [
 
@@ -74,7 +75,7 @@ urlpatterns = [
     path('interpretation/page/<int:pindex>', list_interpretation_page),
 
     # search apis
-    # path('search/page/<int:pindex>'),
+    path('search/page/<int:pindex>', search_by_tag),
 
     # micro evidence apis
     path('micro-evidence', create_micro_evidence),
