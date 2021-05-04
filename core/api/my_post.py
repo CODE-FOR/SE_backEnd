@@ -10,6 +10,7 @@ from core.api.utils import (ErrorCode, failed_api_response, parse_data,
 from core.models.micro_knowledge import MicroKnowledge
 from core.models.user import User
 
+
 @response_wrapper
 @jwt_auth()
 @require_GET
@@ -42,7 +43,7 @@ def list_posts(request: HttpRequest, uid: int, *args, **kwargs):
                 'microconjecture', 'microevidence'
             )
         )
-    
+
     for item in models_info:
         item['like_num'] = MicroKnowledge.objects.get(id=item["id"]).like_num()
         item['favor_num'] = MicroKnowledge.objects.get(id=item["id"]).favorites_num()

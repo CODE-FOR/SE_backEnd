@@ -39,6 +39,14 @@ def search_by_tag(request: HttpRequest, pindex):
 
     cls = type
     params = dict(request.GET)
+
+    print(params.get('pindx'))
+    print(params.get('interpretation'))
+    print(params.get('paper'))
+    print(request.GET.items())
+    print(request.GET.get('pindx'))
+
+
     is_paper = params.get('paper')
     is_interpretation = params.get('interpretation')
     pindex = int(params.get('pindx')[0])

@@ -5,12 +5,12 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.core import serializers
 
-
 from core.api.auth import jwt_auth
 from core.api.utils import (ErrorCode, failed_api_response, parse_data,
                             response_wrapper, success_api_response)
 
 from core.models import Topic, Discussion, User
+
 
 @jwt_auth()
 @require_POST
@@ -32,7 +32,7 @@ def create_discussion(request: HttpRequest):
     data: dict = parse_data(request)
     if not data:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid request args.")
-   	#username = data.get('username')
+    # username = data.get('username')
     user: User = request.user
     topic_id = data.get('topic_id')
     content = data.get('content')
@@ -53,18 +53,19 @@ def create_discussion(request: HttpRequest):
             tu = User.objects.get(id=tu_id)
         except ObjectDoesNotExist:
             return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad User ID.")
-        
+
     if pd_id is None:
         pd = None
     else:
         try:
-            pd = topic.discussion_list.get(id = pd_id)
+            pd = topic.discussion_list.get(id=pd_id)
         except ObjectDoesNotExist:
             return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Comment ID.")
-    discussion = Discussion(topic=topic, user=user, text=content, to_user=tu, parent_discussion = pd)
+    discussion = Discussion(topic=topic, user=user, text=content, to_user=tu, parent_discussion=pd)
     discussion.save()
     ret_data = {'id': discussion.id}
     return success_api_response(ret_data)
+
 
 @jwt_auth()
 @require_POST
@@ -94,6 +95,7 @@ def delete_discussion(request: HttpRequest):
     discussion.delete()
     return success_api_response({'id': discussion_id})
 
+
 @jwt_auth()
 @require_GET
 @response_wrapper
@@ -115,6 +117,7 @@ def get_discussion(request: HttpRequest, id: int):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Knowledge ID.")
     ret_data = discussion.to_dict()
     return success_api_response(ret_data)
+
 
 @jwt_auth()
 @require_GET
@@ -146,7 +149,7 @@ def get_discussion_list(request: HttpRequest):
     if psize is None:
         psize = 20
     try:
-        topic = Topic.objects.get(id = topic_id)
+        topic = Topic.objects.get(id=topic_id)
     except ObjectDoesNotExist:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid micro knowledge id.")
     paginator = Paginator(topic.discussion_list.all(), psize)
