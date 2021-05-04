@@ -13,6 +13,7 @@ def search_by_keyword_and_tags(cls, tags, keyword):
     """
     items = cls.objects.all()
     for tag in tags:
-        items = items & cls.objects.filter(tag_list__id__contains=tag.id)
-
-    return items.distinct & cls.objects.filter(title__contains=keyword)
+        items = items & cls.objects.filter(tag_list__id__contains=tag)
+    print(keyword)
+    print(cls.objects.filter(title__contains='pear'))
+    return (items & cls.objects.filter(title__contains=keyword)).distinct()
