@@ -181,7 +181,7 @@ def list_paper_page(request: HttpRequest, pindex):
     :param pindex: page index
     :return:
     """
-    params = dict(request.GET)
+    params = request.GET.dict()
 
     papers = get_paper_ordered_dec()
     paper_num = Paper.objects.count()
