@@ -30,12 +30,14 @@ class Interpretation(models.Model):
     def be_liked(self, user):
         if self.like_list.filter(user=user):
             self.like_list.remove(user)
-        self.like_list.add(user)
+        else:
+            self.like_list.add(user)
 
     def be_collected(self, user):
         if self.collect_list.filter(user=user):
             self.collect_list.remove(user)
-        self.collect_list.add(user)
+        else:
+            self.collect_list.add(user)
 
     def like_num(self):
         return self.like_list.count()
