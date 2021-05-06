@@ -35,6 +35,8 @@ from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
     list_interpretation_page, like_interpretation, collect_interpretation
 from core.api.search import search_by_tag
 
+from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
+
 urlpatterns = [
 
     # user apis
@@ -45,6 +47,11 @@ urlpatterns = [
     path('user/forget-password', FORGET_PASSWORD_API),
     path('user/profile', get_profile),
     path('user/icon', USER_ICON_API),
+
+    # user post apis
+    path('recent/page/<int:pindex>', follow_recent),
+    path('post/<int:uid>', get_post_by_id),
+    path('favorites/<int:uid>', get_collect_by_id),
 
     # comment apis
     path('comment/create', create_comment),
@@ -79,8 +86,6 @@ urlpatterns = [
     path('interpretation/page/<int:pindex>', list_interpretation_page),
     path('interpretation/<int:id>/like', like_interpretation),
     path('interpretation/<int:id>/collect', collect_interpretation),
-
-    #
 
     # search apis
     path('search/page/<int:pindex>', search_by_tag),

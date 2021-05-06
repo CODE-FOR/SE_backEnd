@@ -69,7 +69,7 @@ class Paper(models.Model):
 
     def be_collected(self, user):
         if self.collect_list.filter(user=user).exists():
-            print('user=user')
+            self.collect_list.remove(user)
         else:
             self.collect_list.add(user)
 
@@ -92,6 +92,7 @@ class Paper(models.Model):
         tags = list(self.tag_list.values('id', 'name', 'type'))  # dic
         author = list(self.get_author())  # tuple
         rst.update({
+            "type": 0,
             "id": self.pk,
             "created_by": self.created_by.to_hash(),
             "tags": tags,  # dic

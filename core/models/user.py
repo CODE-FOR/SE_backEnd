@@ -85,6 +85,32 @@ class User(AbstractUser):
         except Exception:
             return False
 
+    def get_post_unsorted(self):
+        post = []
+        papers = self.create_paper.all()
+        for paper in papers:
+            post.append(paper.to_hash())
+        interpretations = self.create_interpretation.all()
+        for interpretation in interpretations:
+            post.append(interpretation.to_hash())
+        return post
+
+    def get_post_follow_unsorted(self):
+        followers = self.get_follower()
+        recent = []
+        for follower in followers:
+            recent.extend(follower.post_unsorted())
+
+    def get_collect_unsorted(self):
+        post = []
+        papers = self.collect_paper.all()
+        for paper in papers:
+            post.append(paper.to_hash())
+        interpretations = self.collect_interpretation.all()
+        for interpretation in interpretations:
+            post.append(interpretation.to_hash())
+        return post
+
 
 class ConfirmString(models.Model):
     """confirm string
