@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'core',
     'rest_framework',
     'django_extensions',
+    'channels'
     # 'corsheaders',
 ]
 
@@ -109,6 +110,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
