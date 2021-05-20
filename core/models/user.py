@@ -89,10 +89,10 @@ class User(AbstractUser):
         post = []
         papers = self.create_paper.all()
         for paper in papers:
-            post.append(paper.to_hash())
+            post.append(paper.to_hash(self))
         interpretations = self.create_interpretation.all()
         for interpretation in interpretations:
-            post.append(interpretation.to_hash())
+            post.append(interpretation.to_hash(self))
         return post
 
     def get_post_follow_unsorted(self):
