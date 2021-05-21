@@ -39,6 +39,46 @@ CORS_ORIGIN_WHITELIST = (
     '*'
 )
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": ["redis://127.0.0.1:6379/8"],
+#         },
+#     },
+# }
+#
+#
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
+#
+#
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": ["redis://:password@127.0.0.1:6379/0"],
+#             "symmetric_encryption_keys": [SECRET_KEY],
+#         },
+#     },
+# }
+
 CORS_ALLOW_METHODS = (
     'DELETE',
     'GET',
