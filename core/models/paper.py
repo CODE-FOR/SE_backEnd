@@ -85,6 +85,18 @@ class Paper(models.Model):
     def is_collect(self, user):
         return self.collect_list.filter(id=user).exists()
 
+    def be_reported(self, user, reason):
+        new_report = Paper_report()
+        new_report.reason = reason
+        new_report.paperid = self
+        new_report.created_by = user
+        new_report.save()
+        return new_report.pk
+
+    def safe_delete(self, reason):
+        self.is_deleted = True
+        # delete interpretation
+
     def to_hash(self, user):
         if hasattr(user, 'id'):
             user = user.id
@@ -155,55 +167,28 @@ def get_paper_ordered_dec():
     return papers
 
 
-'''
-    def favorites_num(self):
-        return self.favorites.values().count()
-
-    def is_favor(self, pid):
-        try:
-            p = User.objects.get(pk=pid)
-            return p.favorites.values().filter(pk=self.id).exists()
-        except Exception:
-            return False
-
-    def like_num(self):
-        return self.like_list.values().count()
-
-    def is_like(self, pid):
-        try:
-            p = User.objects.get(pk=pid)
-            return p.like_list.values().filter(pk=self.id).exists()
-        except Exception:
-            return False
-
-    def micro_type(self):
-        return MICRO_KNOWLEDGE
-
-    @classmethod
-    def search_by_keywords_and_tags(cls, keywords=None, tags=None):
-        """
-        search all the objects has keywords and tags
-        :param keywords: iterator of string, search while in content
-        :param tags: iterator of string, search the tags in content
-        :return: a query set
-        """
-        tags = tags.split() if tags is not None else []
-        keywords = keywords.split() if keywords is not None else []
-        qs = cls.objects.all()
-        if tags:
-            for tag_str in tags:
-                tag_list = Tag.objects.filter(name__icontains=tag_str)
-                qs_tag = cls.objects.none()
-                for tag in tag_list:
-                    qs_tag = qs_tag | cls.objects.filter(tag_list__id__contains=tag.id)
-                qs = qs & qs_tag
-        if keywords:
-            for keyword in keywords:
-                qs = qs & cls.objects.filter(content__icontains=keyword)
-        return qs.distinct()
-'''
-
-
 class Paper_author(models.Model):
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='authors')
     name = models.CharField(max_length=50)
+
+
+class Paper_report(models.Model):
+    report_id = models.IntegerField(primary_key=True, auto_created=True)
+    paperid = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=512)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_paper')
+
+    def to_hash(self, user):
+        rst = dict()
+        rst.update({
+            "id": self.pk,
+            "created_by": self.created_by.to_hash(),
+            "reason": self.reason,
+            "created_at": self.created_at,
+            "paper": self.paperid.to_hash(user),
+        })
+        return rst
+
+def get_all_report():
+    pass

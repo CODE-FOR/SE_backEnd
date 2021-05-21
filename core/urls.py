@@ -30,7 +30,7 @@ from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_
 from core.api.word_cloud import word_cloud
 
 from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title, \
-    like_paper, collect_paper
+    like_paper, collect_paper, report_paper, list_paper_report, delete_paper
 from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
     list_interpretation_page, like_interpretation, collect_interpretation
 from core.api.search import search_by_tag
@@ -79,6 +79,9 @@ urlpatterns = [
     path('paper/titles', get_paper_title),
     path('paper/<int:id>/like', like_paper),
     path('paper/<int:id>/collect', collect_paper),
+    path('paper/report/create', report_paper),
+    path('paper/report/page/<int:pindex>', list_paper_report),
+    path('paper/delete', delete_paper),
 
     # interpretation apis
     path('interpretation/create', create_interpretation),

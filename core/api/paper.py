@@ -10,7 +10,7 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id
+from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_report
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation
 
@@ -83,32 +83,21 @@ def create_paper(request: HttpRequest):
 
 @response_wrapper
 @jwt_auth()
-@require_http_methods('DELETE')
-def delete_paper(request: HttpRequest, id: int):
+@require_http_methods('POST')
+def delete_paper(request: HttpRequest):
     """ delete paper
     :param request:
-    :param id: primary key
+        paperId: id of paper
+        reason: reason
     :return:
     """
-    paper = Paper.objects.get(pk=id)
+    params = json.loads(request.body.decode())
 
-    current_user = request.user
+    paper = Paper.objects.get(pk=params.get("paperId"))
 
-    # for recommend
-    # tags = current_user.user_tags[1:-1]
-    # tags_arr: list = [0] * 70 if tags == '' else [int(s) for s in tags.split(',')]
-    # mk_tags = micro_evidence.tag_list.all()
-    # for tag in mk_tags:
-    #     if tag.type == 0:
-    #         tags_arr[tag.id] -= 1
-    # current_user.user_tags = tags_arr
-    # current_user.save()
-    # end
+    p = request.user
 
-    # if current_user == paper.created_by
-
-    paper.is_deleted = True
-    paper.save()
+    paper.safe_delete(reason)
 
     return success_api_response({})
 
@@ -221,11 +210,78 @@ def get_paper_title(request: HttpRequest):
     })
 
 
+@response_wrapper
+@jwt_auth()
+@require_http_methods('POST')
+def report_paper(request: HttpRequest):
+    """
+    :param request:
+        paperId: paper id
+        reason: reason
+
+    :return:
+        report_id
+    """
+    params = json.loads(request.body.decode())
+    user = request.user
+
+    paper_id = params.get("paperId")
+    reason = params.get("reason")
+
+    paper = Paper.objects.filter(pk=paper_id)
+    if paper.exists():
+        paper = paper.first()
+    else:
+        return failed_api_response(ErrorCode.ID_NOT_EXISTS, "invalid paper id")
+
+    report_id = paper.be_reported(user, reason)
+
+    return success_api_response({
+        "id": report_id
+    })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def list_paper_report(request: HttpRequest, pindex):
+    """
+    get a page as order in time
+    :param request:
+        user_id: request user id
+    :param pindex: page index
+    :return:
+    """
+    params = request.GET.dict()
+
+    reports = get_all_report()
+    report_num = Paper_report.objects.count()
+    p = request.user
+    if params.get('user_id'):
+        p = User.objects.get(pk=params.get('user_id'))
+    num_per_page = 5
+    if params.get('num_per_page', None):
+        num_per_page = int(params.get('num_per_page', None))
+    paginator = Paginator(reports, num_per_page)
+    report_page = paginator.page(pindex)
+    page_json = []
+    for item in report_page.object_list:
+        rst = item.to_hash(p)
+        page_json.append(rst)
+    return success_api_response({
+        "reports": page_json,
+        "has_next": report_page.has_next(),
+        "has_previous": report_page.has_previous(),
+        "number": report_page.number,   # page current
+        "page_num": paginator.num_pages,    # total pages
+        "report_num": report_num,   # total number of reports
+    })
+
+
 PAPER_API = wrapped_api({
     'POST': create_paper,
     'DELETE': delete_paper,
     # 'PUT': update_micro_evidence,
     'GET': get_signal_paper
 })
-
 
