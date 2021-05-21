@@ -4,9 +4,10 @@ from asgiref.sync import async_to_sync
 
 
 class ChatConsumer(WebsocketConsumer):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(args, kwargs)
-    #     self.chat_group_name = set()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.chat_user_list = set()
+        self.user_id = 0
 
     def connect(self):
         self.accept()
@@ -25,6 +26,8 @@ class ChatConsumer(WebsocketConsumer):
             self.deal_send_msg(text_data_json)
         if code == 700:
             self.deal_create_groups(text_data_json['user_id'], text_data_json['chat_list'])
+        if code == 800:
+            self.add_new_chat_user(text_data_json['user_id'])
 
     def deal_send_msg(self, get_msg):
         sender_id = get_msg['sender_id']
@@ -74,19 +77,69 @@ class ChatConsumer(WebsocketConsumer):
     """
     # TODO: the message may lost when A send message to B, when B's chat user list does not include A.
     def deal_create_groups(self, user_id, chat_list):
+        self.user_id = user_id
         async_to_sync(self.channel_layer.group_add)(
             str(user_id),
             self.channel_name
         )
         for chat_id in chat_list:
+            self.chat_user_list.add(chat_id)
             min_id = user_id if user_id < chat_id else chat_id
             max_id = user_id if user_id > chat_id else chat_id
             chat_group_name = str(min_id) + "_" + str(max_id)
-            # self.chat_group_name.add(chat_group_name)
             print(chat_id)
             print(chat_group_name)
             async_to_sync(self.channel_layer.group_add)(
                 chat_group_name,
+                self.channel_name
+            )
+
+    """In the group part, three steps:
+            1) Add user_id to self.channel's group
+            2) Send self.user_id to group: user_id
+                This will notify user_id self.user_id is trying to chat with him
+            3) Delete user_id from self.channel's group
+                This is for safety, self.user_id should not get message
+                from group: user_id any more.
+            Besides, for safety, only one channel which user is not user_id
+            can hold this group. Otherwise, for instance: A & B got this group.
+            When A notify C(user id), B will get that message, which is not allowed.
+    """
+    # TODO: must make sure this function is a synchronous function
+    #  new add test, like print(self.user_id) several times
+    #  Then check if in the terminal the outputs for user_id is synchronous.
+    #  two or more users together test.
+    def add_new_chat_user(self, user_id):
+        print(user_id)
+        if user_id not in self.chat_user_list:
+            self.chat_user_list.add(user_id)
+            min_id = user_id if user_id < self.user_id else self.user_id
+            max_id = user_id if user_id > self.user_id else self.user_id
+            chat_group_name = str(min_id) + "_" + str(max_id)
+            async_to_sync(self.channel_layer.group_add)(
+                chat_group_name,
+                self.channel_name
+            )
+            print('group add')
+            async_to_sync(self.channel_layer.group_add)(
+                str(user_id),
+                self.channel_name
+            )
+            print('group send')
+            async_to_sync(self.channel_layer.group_send)(
+                str(user_id),
+                {
+                    'type': 'add_user_message',
+                    'message': {
+                        'code': 810,
+                        'user_id': self.user_id
+                        # 'user_id': 16
+                    }
+                }
+            )
+            print('group discard')
+            async_to_sync(self.channel_layer.group_discard)(
+                str(user_id),
                 self.channel_name
             )
 
@@ -96,3 +149,20 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+
+    # def add_user_message(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
+
+    def websocket_disconnect(self, close_code):
+        for user_id in self.chat_user_list:
+            min_id = min(user_id, self.user_id)
+            max_id = max(user_id, self.user_id)
+            chat_group_name = str(min_id) + "_" + str(max_id)
+            print(chat_group_name)
+            async_to_sync(self.channel_layer.group_discard)(
+                chat_group_name,
+                self.channel_name
+            )
