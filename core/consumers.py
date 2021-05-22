@@ -94,21 +94,6 @@ class ChatConsumer(WebsocketConsumer):
                 self.channel_name
             )
 
-    """In the group part, three steps:
-            1) Add user_id to self.channel's group
-            2) Send self.user_id to group: user_id
-                This will notify user_id self.user_id is trying to chat with him
-            3) Delete user_id from self.channel's group
-                This is for safety, self.user_id should not get message
-                from group: user_id any more.
-            Besides, for safety, only one channel which user is not user_id
-            can hold this group. Otherwise, for instance: A & B got this group.
-            When A notify C(user id), B will get that message, which is not allowed.
-    """
-    # TODO: must make sure this function is a synchronous function
-    #  new add test, like print(self.user_id) several times
-    #  Then check if in the terminal the outputs for user_id is synchronous.
-    #  two or more users together test.
     def add_new_chat_user(self, user_id):
         print(user_id)
         if user_id not in self.chat_user_list:
@@ -120,12 +105,8 @@ class ChatConsumer(WebsocketConsumer):
                 chat_group_name,
                 self.channel_name
             )
-            print('group add')
-            async_to_sync(self.channel_layer.group_add)(
-                str(user_id),
-                self.channel_name
-            )
-            print('group send')
+            """Channels not in Group can send message
+            """
             async_to_sync(self.channel_layer.group_send)(
                 str(user_id),
                 {
@@ -133,14 +114,8 @@ class ChatConsumer(WebsocketConsumer):
                     'message': {
                         'code': 810,
                         'user_id': self.user_id
-                        # 'user_id': 16
                     }
                 }
-            )
-            print('group discard')
-            async_to_sync(self.channel_layer.group_discard)(
-                str(user_id),
-                self.channel_name
             )
 
     def chat_message(self, event):
@@ -150,7 +125,7 @@ class ChatConsumer(WebsocketConsumer):
             'message': message
         }))
 
-    # def add_user_message(self, event):
+    def add_user_message(self, event):
         message = event['message']
         self.send(text_data=json.dumps({
             'message': message
