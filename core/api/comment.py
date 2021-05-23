@@ -5,12 +5,13 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.core import serializers
 
-
 from core.api.auth import jwt_auth
 from core.api.utils import (ErrorCode, failed_api_response, parse_data,
                             response_wrapper, success_api_response)
 
-from core.models import Comment, MicroKnowledge, User
+from core.models import Comment, User
+from core.models.interpretation import Interpretation
+
 
 @jwt_auth()
 @require_POST
@@ -22,17 +23,16 @@ def create_comment(request: HttpRequest):
     [method]: POST
 
     [route]: /api/comment/create
-    
-    parms:
-		- micro_knowledge_id: int
-		- content: string
+    params:
+        - micro_knowledge_id: int
+        - content: string
         - to_user_id: int
         - parent_comment_id: int
     """
     data: dict = parse_data(request)
     if not data:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid request args.")
-   	#username = data.get('username')
+
     user: User = request.user
     knowledge_id = data.get('micro_knowledge_id')
     content = data.get('content')
@@ -43,7 +43,7 @@ def create_comment(request: HttpRequest):
     if len(content) > 500:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Content size too large.")
     try:
-        knowledge = MicroKnowledge.objects.get(id=knowledge_id)
+        knowledge = Interpretation.objects.get(pk=knowledge_id)
     except ObjectDoesNotExist:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Knowledge ID.")
     if tu_id is None:
@@ -53,20 +53,22 @@ def create_comment(request: HttpRequest):
             tu = User.objects.get(id=tu_id)
         except ObjectDoesNotExist:
             return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad User ID.")
-        
+
     if pc_id is None:
         pc = None
     else:
         try:
-            pc = knowledge.comment_list.get(id = pc_id)
+            pc = knowledge.comment_list.get(id=pc_id)
         except ObjectDoesNotExist:
             return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Comment ID.")
-    #if (pc is None)^(tu is None):
+    # if (pc is None)^(tu is None):
     #    return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad parent Comment and to User.")
-    comment = Comment(micro_knowledge = knowledge, user=user, created_at = timezone.localtime(timezone.now()), text=content, to_user=tu, parent_comment = pc)
+    comment = Comment(interpretation=knowledge, user=user, created_at=timezone.localtime(timezone.now()), text=content,
+                      to_user=tu, parent_comment=pc)
     comment.save()
     ret_data = {'id': comment.id}
     return success_api_response(ret_data)
+
 
 @jwt_auth()
 @require_POST
@@ -96,19 +98,21 @@ def delete_comment(request: HttpRequest):
     comment.delete()
     return success_api_response({'id': comment_id})
 
+
 def comment2json(comment: Comment) -> dict:
-    data: dict = {'id': comment.id, 
-            'username': comment.user.username, 
-            'user_id': comment.user.id, 
-            'created_at': comment.created_at, 
-            'text': comment.text, 
-            'micro_knowledge_id': comment.micro_knowledge.id,
-            }
+    data: dict = {'id': comment.id,
+                  'username': comment.user.username,
+                  'user_id': comment.user.id,
+                  'created_at': comment.created_at,
+                  'text': comment.text,
+                  'micro_knowledge_id': comment.interpretation.id,
+                  }
     if comment.to_user is not None:
-        data['to_user']={'id': comment.to_user.id, 'username': comment.to_user.username}
+        data['to_user'] = {'id': comment.to_user.id, 'username': comment.to_user.username}
     if comment.parent_comment is not None:
-        data['parent_comment_id']= comment.parent_comment.id
+        data['parent_comment_id'] = comment.parent_comment.id
     return data
+
 
 @jwt_auth()
 @require_GET
@@ -131,6 +135,7 @@ def get_comment(request: HttpRequest, id: int):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Knowledge ID.")
     ret_data = comment2json(comment)
     return success_api_response(ret_data)
+
 
 @jwt_auth()
 @require_GET
@@ -162,7 +167,7 @@ def get_comment_list(request: HttpRequest):
     if psize is None:
         psize = 20
     try:
-        mk = MicroKnowledge.objects.get(id = mk_id)
+        mk = Interpretation.objects.get(pk=mk_id)
     except ObjectDoesNotExist:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid micro knowledge id.")
     paginator = Paginator(mk.comment_list.all(), psize)
@@ -172,5 +177,5 @@ def get_comment_list(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad page args.")
     re_data = {'comment_list': [comment2json(comment) for comment in cp.object_list], 'page_count': paginator.num_pages}
     return success_api_response(re_data)
-    #cl = list(cp.object_list.values())
-    #return success_api_response({'comment_list': cl, 'page_count': paginator.count})
+    # cl = list(cp.object_list.values())
+    # return success_api_response({'comment_list': cl, 'page_count': paginator.count})
