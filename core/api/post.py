@@ -30,7 +30,7 @@ def follow_recent(request: HttpRequest, pindex):
 
     user_to = User.objects.filter(id=p.id).first()
 
-    items = sorted(user_to.get_post_follow_unsorted(), key=lambda keys: keys['created_at'], reverse=True)
+    items = sorted(user_to.get_post_follow_unsorted(p), key=lambda keys: keys['created_at'], reverse=True)
     total_count = len(items)
 
     num_per_page = 5
@@ -38,10 +38,18 @@ def follow_recent(request: HttpRequest, pindex):
         num_per_page = int(params.get('num_per_page', None))
     paginator = Paginator(items, num_per_page)
     result = paginator.page(pindex)
+
+    result = paginator.page(pindex)
+
+    result_json = []
+    for item in result.object_list:
+        result_json.append(item)
+
     return success_api_response({
         "page_num": paginator.num_pages,
-        "recent": result,
+        "recent": result_json,
     })
+
 
 
 @response_wrapper
@@ -67,7 +75,7 @@ def get_post_by_id(request: HttpRequest, uid):
     else:
         failed_api_response(ErrorCode.ID_NOT_EXISTS, "user id not exists!")
 
-    items = sorted(user_to.get_post_unsorted(), key=lambda keys: keys['created_at'], reverse=True)
+    items = sorted(user_to.get_post_unsorted(p), key=lambda keys: keys['created_at'], reverse=True)
     total_count = len(items)
 
     num_per_page = 5
@@ -75,9 +83,14 @@ def get_post_by_id(request: HttpRequest, uid):
         num_per_page = int(params.get('num_per_page', None))
     paginator = Paginator(items, num_per_page)
     result = paginator.page(pindex)
+
+    result_json = []
+    for item in result.object_list:
+        result_json.append(item)
+
     return success_api_response({
         "total_count": total_count,
-        "posts": result,
+        "posts": result_json,
     })
 
 
@@ -104,7 +117,7 @@ def get_collect_by_id(request: HttpRequest, uid):
     else:
         failed_api_response(ErrorCode.ID_NOT_EXISTS, "user id not exists!")
 
-    items = sorted(user_to.get_collect_unsorted(), key=lambda keys: keys['created_at'], reverse=True)
+    items = sorted(user_to.get_collect_unsorted(p), key=lambda keys: keys['created_at'], reverse=True)
     total_count = len(items)
 
     num_per_page = 5
@@ -112,7 +125,12 @@ def get_collect_by_id(request: HttpRequest, uid):
         num_per_page = int(params.get('num_per_page', None))
     paginator = Paginator(items, num_per_page)
     result = paginator.page(pindex)
+
+    result_json = []
+    for item in result.object_list:
+        result_json.append(item)
+
     return success_api_response({
         "total_count": total_count,
-        "posts": result,
+        "posts": result_json,
     })

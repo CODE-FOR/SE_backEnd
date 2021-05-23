@@ -85,30 +85,30 @@ class User(AbstractUser):
         except Exception:
             return False
 
-    def get_post_unsorted(self):
+    def get_post_unsorted(self, user):
         post = []
         papers = self.create_paper.all()
         for paper in papers:
-            post.append(paper.to_hash(self))
+            post.append(paper.to_hash(user))
         interpretations = self.create_interpretation.all()
         for interpretation in interpretations:
-            post.append(interpretation.to_hash(self))
+            post.append(interpretation.to_hash(user))
         return post
 
-    def get_post_follow_unsorted(self):
+    def get_post_follow_unsorted(self, user):
         followers = self.get_follower()
         recent = []
         for follower in followers:
-            recent.extend(follower.post_unsorted())
+            recent.extend(follower.get_post_unsorted(user))
 
-    def get_collect_unsorted(self):
+    def get_collect_unsorted(self, user):
         post = []
         papers = self.collect_paper.all()
         for paper in papers:
-            post.append(paper.to_hash())
+            post.append(paper.to_hash(user))
         interpretations = self.collect_interpretation.all()
         for interpretation in interpretations:
-            post.append(interpretation.to_hash())
+            post.append(interpretation.to_hash(user))
         return post
 
 
