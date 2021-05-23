@@ -100,6 +100,7 @@ class User(AbstractUser):
         recent = []
         for follower in followers:
             recent.extend(follower.get_post_unsorted(user))
+        return recent
 
     def get_collect_unsorted(self, user):
         post = []
