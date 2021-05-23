@@ -62,13 +62,13 @@ class Paper(models.Model):
             author_model.save()
 
     def be_liked(self, user):
-        if self.like_list.filter(user=user).exists():
+        if self.like_list.filter(id=user.id).exists():
             self.like_list.remove(user)
         else:
             self.like_list.add(user)
 
     def be_collected(self, user):
-        if self.collect_list.filter(user=user).exists():
+        if self.collect_list.filter(id=user.id).count() != 0:
             self.collect_list.remove(user)
         else:
             self.collect_list.add(user)

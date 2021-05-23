@@ -28,13 +28,13 @@ class Interpretation(models.Model):
     collect_list = models.ManyToManyField(to='User', related_name='collect_interpretation')
 
     def be_liked(self, user):
-        if self.like_list.filter(user=user):
+        if self.like_list.filter(id=user.id):
             self.like_list.remove(user)
         else:
             self.like_list.add(user)
 
     def be_collected(self, user):
-        if self.collect_list.filter(user=user):
+        if self.collect_list.filter(id=user.id):
             self.collect_list.remove(user)
         else:
             self.collect_list.add(user)
