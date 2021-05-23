@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from core.models.user import ConfirmString, User
 
+
 def make_confirm_string(email: str):
     """generate confirm string
 
@@ -37,17 +38,17 @@ def send_email(email, code):
         code {str} -- check code
     """
 
-    subject = '来自还没起名字的论文解读平台的注册邮件'
+    subject = '来自造论子论文解读平台的注册邮件'
 
-    text_content = '''感谢注册还没（后略），如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
+    text_content = '''感谢注册造论子论文解读平台，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
 
     template = loader.get_template('send_email.html')
 
     html_content = template.render(
-                        {
-                            'code':code
-                        }
-                   )
+        {
+            'code': code
+        }
+    )
 
     msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
     msg.attach_alternative(html_content, "text/html")
@@ -62,18 +63,18 @@ def send_forget(email, code):
         code {str} -- check code
     """
 
-    subject = '来自（）的修改密码确认邮件'
+    subject = '来自造论子论文解读平台的修改密码确认邮件'
 
-    text_content = '''感谢使用****，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
+    text_content = '''感谢使用造论子论文解读平台，如果你看到这条消息，说明你的邮箱服务器不提供HTML链接功能，请联系管理员！'''
 
     template = loader.get_template('send_forget.html')
 
     html_content = template.render(
-                        {
-                            'name': User.objects.get(email=email).username,
-                            'code':code
-                        }
-                   )
+        {
+            'name': User.objects.get(email=email).username,
+            'code': code
+        }
+    )
 
     msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
     msg.attach_alternative(html_content, "text/html")
