@@ -31,6 +31,8 @@ class ChatConsumer(WebsocketConsumer):
         Send to group(str(sender_id)) is for there are several channels in sender_id,
             the message send out should be in every channel.
             To notify those channels, should send to group(str(sender_id))
+            Need to judge whether sender_id and receiver_id is the same id,
+            otherwise message will be send twice.
     """
     def deal_send_msg(self, get_msg):
         sender_id = get_msg['sender_id']
@@ -49,10 +51,11 @@ class ChatConsumer(WebsocketConsumer):
                 'code': 610
             }
         }
-        async_to_sync(self.channel_layer.group_send)(
-            str(sender_id),
-            send_data
-        )
+        if not sender_id == receiver_id:
+            async_to_sync(self.channel_layer.group_send)(
+                str(sender_id),
+                send_data
+            )
         async_to_sync(self.channel_layer.group_send)(
             str(receiver_id),
             send_data
