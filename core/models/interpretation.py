@@ -57,7 +57,7 @@ class Interpretation(models.Model):
         rst = dict()
         tags = list(self.tag_list.values('id', 'name', 'type'))  # dic
         rst.update({
-            "type": 0,
+            "type": 1,
             "tags": tags,
             "id": self.id,
             "created_by": self.created_by.to_hash(),
@@ -78,7 +78,7 @@ class Interpretation(models.Model):
         rst = dict()
         tags = list(self.tag_list.values('id', 'name', 'type'))
         rst.update({
-            "type": 0,
+            "type": 1,
             "tags": tags,
             "id": self.id,
             "created_by": self.created_by.to_hash(),
