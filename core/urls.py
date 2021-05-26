@@ -37,6 +37,8 @@ from core.api.search import search_by_tag
 
 from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
 
+from core.api.chat import get_user_chat_by_id, clear_unread_by_id, get_chat_list
+
 urlpatterns = [
 
     # user apis
@@ -71,6 +73,11 @@ urlpatterns = [
     path('micro-knowledge/page/<int:pindex>', MICRO_KNOWLEDGE_SET_API),
     path('favorites/page/<int:pindex>', FAVORITES_SET_API),
     path('micro-knowledge/<int:id>/judge', MICRO_KNOWLEDGE_JUDGE_API),
+
+    # chat apis
+    path('chat-user-list', get_chat_list),
+    path('clear-unread', clear_unread_by_id),
+    path('chat-user', get_user_chat_by_id),
 
     # paper apis
     path('paper', create_paper),

@@ -37,6 +37,15 @@ class User(AbstractUser):
         })
         return rst
 
+    def to_hash_chat(self):
+        rst = dict()
+        rst.update({
+            "id": self.id,
+            "name": self.username,
+            "email": self.email,
+        })
+        return rst
+
     def simple_to_dict(self):
         return {
             'nick_name': self.nick_name,
