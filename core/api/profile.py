@@ -30,7 +30,7 @@ def get_profile(request: HttpRequest):
         'nickname': user.nick_name,
         'email': user.email,
         'institution': user.institution,
-        'total_post': user.created_by.count(),
+        'total_post': user.create_paper.count() + user.create_interpretation.count(),
         'total_like': total_like,
         'total_fan': user.user_set.count(),
         'is_following': user.user_set.filter(id=request.user.id).exists(),
