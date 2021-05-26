@@ -20,7 +20,7 @@ class Chat(models.Model):
 
 
 class Chat_list(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_list')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_chat_list')
     target = models.ForeignKey(User, on_delete=models.CASCADE)
     update_time = models.DateTimeField(auto_now=True)
     unread = models.IntegerField(default=0)
