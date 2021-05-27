@@ -12,7 +12,7 @@ from core.models.user import User
 from core.api.auth import jwt_auth
 from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_report
 from django.core.paginator import Paginator
-from core.models.chat import Chat_list, Chat, get_chat_list_by_id, add_chat_list_or_update_it
+from core.models.chat import Chat_list, Chat, get_chat_list_by_id, add_chat_list_or_update_it, get_message_by_id
 
 
 # chat curd
@@ -85,6 +85,17 @@ def add_user_into_list(request: HttpRequest):
     return success_api_response({})
 
 
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def get_message_list_by_id(request: HttpRequest):
+    p = request.user
+
+    return success_api_response({
+        'message_list': get_message_by_id(p)
+    })
+
+
 def add_chat_message(sender, receiver, msg):
     sender = User.objects.filter(id=sender).first()
     receiver = User.objects.filter(id=receiver).first()
@@ -96,3 +107,5 @@ def add_chat_message(sender, receiver, msg):
     if sender != receiver:
         if Chat_list.objects.filter(owner=receiver, target=sender).exists():
             Chat_list.objects.filter(owner=receiver, target=sender).first().add_chat()
+
+

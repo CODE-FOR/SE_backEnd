@@ -4,6 +4,8 @@ chat
 from django.db import models
 from django.contrib.auth import get_user_model
 from .user import User
+from django.db.models import Q
+
 
 READ_STATE_CHIOCES = (
     (0, 'Not read'),
@@ -17,6 +19,34 @@ class Chat(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_chat')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receive_chat')
     # read_state = models.IntegerField(choices=READ_STATE_CHIOCES)
+
+    def to_hash(self):
+        rst = dict()
+        rst.update({
+            'time': self.created_at,
+            'message': self.message,
+            'to_id': self.receiver.id,
+            'send_id': self.sender.id,
+        })
+        return rst
+
+
+def get_message_by_id(user):
+    messages = Chat.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-created_at')
+    rst = dict()
+    for message in messages:
+        target = 0
+        if message.sender == user:
+            target = message.receiver.id
+        elif message.receiver == user:
+            target = message.sender.id
+        else:
+            return rst
+        if target in rst:
+            rst[target].append(message.to_hash())
+        else:
+            rst[target] = [message.to_hash()]
+    return rst
 
 
 class Chat_list(models.Model):
@@ -33,7 +63,7 @@ class Chat_list(models.Model):
             'name': self.target.username,
             'email': self.target.email,
             'last_message': self.last_message,
-            'have_unread_message': self.unread == 0,
+            'have_unread_message': self.unread != 0,
             'unread_message_num': self.unread,
         })
         return rst
