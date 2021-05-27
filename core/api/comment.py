@@ -63,7 +63,7 @@ def create_comment(request: HttpRequest):
             return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Comment ID.")
     # if (pc is None)^(tu is None):
     #    return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad parent Comment and to User.")
-    comment = Comment(interpretation=knowledge, user=user, created_at=timezone.localtime(timezone.now()), text=content,
+    comment = Comment(interpretation=knowledge, user=user, text=content,
                       to_user=tu, parent_comment=pc)
     comment.save()
     ret_data = {'id': comment.id}
