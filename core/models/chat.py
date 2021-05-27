@@ -77,6 +77,9 @@ class Chat_list(models.Model):
         })
         return rst
 
+    def update_msg(self, msg):
+        self.last_message = msg
+
     def chat_in(self):
         self.save()
 

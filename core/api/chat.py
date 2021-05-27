@@ -119,9 +119,13 @@ def add_chat_message(sender, receiver, msg):
     c.sender = sender
     c.message = msg
     c.save()
+    Chat_list.objects.filter(owner=sender, target=receiver).first().update_msg(msg)
     if sender != receiver:
-        if Chat_list.objects.filter(owner=receiver, target=sender).exists():
-            Chat_list.objects.filter(owner=receiver, target=sender).first().add_chat()
+        cl = Chat_list.objects.filter(owner=receiver, target=sender)
+        if cl.exists():
+            cl = cl.first()
+            cl.add_chat()
+            cl.update_msg(msg)
     return c.created_at
 
 
