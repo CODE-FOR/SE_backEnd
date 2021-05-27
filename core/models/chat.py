@@ -34,7 +34,7 @@ class Chat_list(models.Model):
             'email': self.target.email,
             'last_message': self.last_message,
             'have_unread_message': self.unread == 0,
-            'unread_message_num': 2,
+            'unread_message_num': self.unread,
         })
         return rst
 

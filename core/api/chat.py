@@ -86,6 +86,8 @@ def add_user_into_list(request: HttpRequest):
 
 
 def add_chat_message(sender, receiver, msg):
+    sender = User.objects.filter(id=sender).first()
+    receiver = User.objects.filter(id=receiver).first()
     c = Chat()
     c.receiver = receiver
     c.sender = sender
