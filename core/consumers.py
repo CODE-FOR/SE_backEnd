@@ -2,6 +2,7 @@ from channels.generic.websocket import WebsocketConsumer
 import json
 from asgiref.sync import async_to_sync
 from core.models.chat import add_chat_list_or_update_it
+from core.api.chat import add_chat_message
 from core.models.user import User
 
 class ChatConsumer(WebsocketConsumer):
@@ -43,6 +44,9 @@ class ChatConsumer(WebsocketConsumer):
             u = User.objects.filter(id=receiver_id).first()
             t = User.objects.filter(id=sender_id).first()
             add_chat_list_or_update_it(u, t)
+
+        add_chat_message(sender_id, receiver_id, get_msg['msg']['message'])
+
         send_data = {
             'type': 'chat_message',
             'message': {

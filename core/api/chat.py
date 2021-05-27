@@ -83,3 +83,14 @@ def add_user_into_list(request: HttpRequest):
 
     add_chat_list_or_update_it(user, target)
     return success_api_response({})
+
+
+def add_chat_message(sender, receiver, msg):
+    c = Chat()
+    c.receiver = receiver
+    c.sender = sender
+    c.message = msg
+    c.save()
+    if sender != receiver:
+        if Chat_list.objects.filter(owner=receiver, target=sender).exists():
+            Chat_list.objects.filter(owner=receiver, target=sender).first().add_chat()
