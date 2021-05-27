@@ -37,7 +37,8 @@ from core.api.search import search_by_tag
 
 from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
 
-from core.api.chat import get_user_chat_by_id, clear_unread_by_id, get_chat_list, add_user_into_list, get_message_list_by_id
+from core.api.chat import get_user_chat_by_id, clear_unread_by_id, get_chat_list, add_user_into_list, \
+    get_message_list_by_id, get_message_by_id
 
 urlpatterns = [
 
@@ -80,6 +81,7 @@ urlpatterns = [
     path('chat-user', get_user_chat_by_id),
     path('add-usr-into-chat-list', add_user_into_list),
     path('chat-message-list', get_message_list_by_id),
+    path('chat-message', get_message_by_id),
 
     # paper apis
     path('paper', create_paper),

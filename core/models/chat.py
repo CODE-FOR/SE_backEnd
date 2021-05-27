@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from .user import User
 from django.db.models import Q
 
-
 READ_STATE_CHIOCES = (
     (0, 'Not read'),
     (1, 'Read'),
@@ -18,6 +17,7 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_chat')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receive_chat')
+
     # read_state = models.IntegerField(choices=READ_STATE_CHIOCES)
 
     def to_hash(self):
@@ -31,7 +31,7 @@ class Chat(models.Model):
         return rst
 
 
-def get_message_by_id(user):
+def get_all_message_by_id(user):
     messages = Chat.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('created_at')
     rst = dict()
     for message in messages:
@@ -46,6 +46,15 @@ def get_message_by_id(user):
             rst[target].append(message.to_hash())
         else:
             rst[target] = [message.to_hash()]
+    return rst
+
+
+def get_one_message_by_id(user, target):
+    messages = Chat.objects.filter(
+        (Q(sender=user) & Q(receiver=target)) | (Q(receiver=user) & Q(sender=target))).order_by('created_at')
+    rst = []
+    for message in messages:
+        rst.append(message.to_hash())
     return rst
 
 
