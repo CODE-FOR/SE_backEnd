@@ -23,7 +23,7 @@ class Chat(models.Model):
     def to_hash(self):
         rst = dict()
         rst.update({
-            'time': self.created_at,
+            'time': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'message': self.message,
             'to_id': self.receiver.id,
             'send_id': self.sender.id,

@@ -45,7 +45,7 @@ class ChatConsumer(WebsocketConsumer):
             t = User.objects.filter(id=sender_id).first()
             add_chat_list_or_update_it(u, t)
 
-        c_time = add_chat_message(sender_id, receiver_id, get_msg['msg']['message'])
+        c_time = add_chat_message(sender_id, receiver_id, get_msg['msg']['message']).strftime('%Y-%m-%d %H:%M:%S')
 
         send_data = {
             'type': 'chat_message',
