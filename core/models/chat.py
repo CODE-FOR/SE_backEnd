@@ -70,7 +70,7 @@ def add_chat_list_or_update_it(user, target):
         Chat_list.objects.filter(owner=user, target=target).first().chat_in()
         return
 
-    c = Chat_list
+    c = Chat_list()
     c.target = target
     c.owner = user
     c.save()
