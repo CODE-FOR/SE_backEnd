@@ -79,6 +79,7 @@ class Chat_list(models.Model):
 
     def update_msg(self, msg):
         self.last_message = msg
+        self.save()
 
     def chat_in(self):
         self.save()
