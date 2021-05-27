@@ -52,8 +52,8 @@ def clear_unread_by_id(request: HttpRequest):
 
     target = params.get("user_id")
     target = User.objects.filter(id=target).first()
-
-    Chat_list.objects.filter(owner=user, target=target).first().clear_unread()
+    if Chat_list.objects.filter(owner=user, target=target).exists():
+        Chat_list.objects.filter(owner=user, target=target).first().clear_unread()
 
     return success_api_response({})
 
