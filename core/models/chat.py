@@ -32,7 +32,7 @@ class Chat(models.Model):
 
 
 def get_message_by_id(user):
-    messages = Chat.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('-created_at')
+    messages = Chat.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('created_at')
     rst = dict()
     for message in messages:
         target = 0
