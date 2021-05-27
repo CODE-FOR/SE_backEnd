@@ -1,7 +1,8 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
 from asgiref.sync import async_to_sync
-
+from core.models.chat import add_chat_list_or_update_it
+from core.models.user import User
 
 class ChatConsumer(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -35,8 +36,13 @@ class ChatConsumer(WebsocketConsumer):
             otherwise message will be send twice.
     """
     def deal_send_msg(self, get_msg):
+        code = get_msg['code']
         sender_id = get_msg['sender_id']
         receiver_id = get_msg['receiver_id']
+        if code == 600:
+            u = User.objects.filter(id=receiver_id).first()
+            t = User.objects.filter(id=sender_id).first()
+            add_chat_list_or_update_it(u, t)
         send_data = {
             'type': 'chat_message',
             'message': {
