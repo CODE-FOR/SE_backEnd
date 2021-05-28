@@ -33,8 +33,8 @@ def get_icon_by_id(request: HttpRequest):
     :return: icon
     """
     user_id = request.GET.dict().get('id')
-
-
+    target = User.objects.get(id=user_id)
+    return target.icon
 
 
 @jwt_auth()
