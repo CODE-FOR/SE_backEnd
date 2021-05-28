@@ -51,7 +51,7 @@ urlpatterns = [
     path('user/forget-password', FORGET_PASSWORD_API),
     path('user/profile', get_profile),
     path('user/icon', USER_ICON_API),
-    path('user/icon_by_id', get_icon_by_id),
+    path('user/icon-by-id', get_icon_by_id),
 
     # user post apis
     path('recent/page/<int:pindex>', follow_recent),

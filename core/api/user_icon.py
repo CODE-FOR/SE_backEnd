@@ -34,7 +34,10 @@ def get_icon_by_id(request: HttpRequest):
     """
     user_id = request.GET.dict().get('id')
     target = User.objects.get(id=user_id)
-    return target.icon
+    print(target)
+    return success_api_response({
+        "icon": str(target.icon)
+    })
 
 
 @jwt_auth()
