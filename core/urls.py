@@ -19,6 +19,7 @@ from core.api.tag import TAG_SET_API
 from core.api.fan import list_fans
 from core.api.follower import list_followers
 from core.api.user_icon import USER_ICON_API
+from core.api.user_icon import get_icon_by_id
 from core.api.notification import (NOTIFICATION_API, NOTIFICATION_SET_API)
 from core.api.project import create_project, PROJECT_API, get_project_list
 from core.api.recommend import recommend
@@ -50,6 +51,7 @@ urlpatterns = [
     path('user/forget-password', FORGET_PASSWORD_API),
     path('user/profile', get_profile),
     path('user/icon', USER_ICON_API),
+    path('user/icon/<int:uid>', get_icon_by_id),
 
     # user post apis
     path('recent/page/<int:pindex>', follow_recent),

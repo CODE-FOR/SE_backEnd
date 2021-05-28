@@ -31,7 +31,7 @@ def list_followers(request: HttpRequest, uid: int, *args, **kwargs):
     else:
         models_info = list(
             paginator.get_page(page).object_list.values(
-                'id', 'username', 'email', 'nick_name', 'institution'
+                'id', 'username', 'email', 'nick_name', 'institution', 'icon'
             )
         )
     data = {

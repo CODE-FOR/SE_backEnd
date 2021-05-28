@@ -74,6 +74,7 @@ class Chat_list(models.Model):
             'last_message': self.last_message,
             'have_unread_message': self.unread != 0,
             'unread_message_num': self.unread,
+            'icon': str(self.target.icon),
         })
         return rst
 
