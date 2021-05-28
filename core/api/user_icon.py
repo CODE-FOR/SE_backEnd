@@ -49,7 +49,7 @@ def change_user_icon(request: HttpRequest):
     """
     # icon = request.FILES.get("icon", None)
     icon = request.POST.dict().get('icon')
-    print(icon)
+    # print(icon)
     if icon is None:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "user icon has not provided.")
 
