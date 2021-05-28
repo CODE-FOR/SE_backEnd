@@ -165,7 +165,7 @@ def get_comment_list(request: HttpRequest):
     if pindex is None:
         pindex = 1
     if psize is None:
-        psize = 20
+        psize = 20000
     try:
         mk = Interpretation.objects.get(pk=mk_id)
     except ObjectDoesNotExist:
