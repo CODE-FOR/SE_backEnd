@@ -89,7 +89,7 @@ class Paper(models.Model):
     def be_reported(self, user, reason):
         new_report = Paper_report()
         new_report.reason = reason
-        new_report.paperid = self
+        new_report.paper_id = self
         new_report.created_by = user
         new_report.save()
         return new_report.pk
@@ -182,7 +182,7 @@ class Paper_author(models.Model):
 
 class Paper_report(models.Model):
     report_id = models.IntegerField(primary_key=True, auto_created=True)
-    paperid = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='reports')
+    paper_id = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='reports')
     reason = models.CharField(max_length=512)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_paper')
@@ -196,7 +196,7 @@ class Paper_report(models.Model):
             "created_by": self.created_by.to_hash(),
             "reason": self.reason,
             "created_at": self.created_at,
-            "paper": self.paperid.pk,
+            "paper": self.paper_id.pk,
         })
         return rst
 
