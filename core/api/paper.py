@@ -10,7 +10,7 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_report
+from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_paper_report
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation
 
@@ -97,7 +97,7 @@ def delete_paper(request: HttpRequest):
 
     p = request.user
 
-    paper.safe_delete(reason)
+    paper.safe_delete(params.get("reason"))
 
     return success_api_response({})
 
@@ -114,6 +114,9 @@ def get_signal_paper(request: HttpRequest, id: int):
     p = request.user
     paper = Paper.objects.get(pk=id)
     rst = paper.to_hash(p)
+
+    if paper.is_deleted:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Paper ID.")
 
     interpretations = paper.get_related_interpretation(p)
 
@@ -254,7 +257,7 @@ def list_paper_report(request: HttpRequest, pindex):
     """
     params = request.GET.dict()
 
-    reports = get_all_report()
+    reports = get_all_paper_report()
     report_num = Paper_report.objects.count()
     p = request.user
     if params.get('user_id'):

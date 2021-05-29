@@ -33,7 +33,8 @@ from core.api.word_cloud import word_cloud
 from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title, \
     like_paper, collect_paper, report_paper, list_paper_report, delete_paper
 from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
-    list_interpretation_page, like_interpretation, collect_interpretation
+    list_interpretation_page, like_interpretation, collect_interpretation, delete_interpretation, \
+    report_interpretation, list_interpretation_report
 from core.api.search import search_by_tag
 
 from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
@@ -92,6 +93,7 @@ urlpatterns = [
     path('paper/titles', get_paper_title),
     path('paper/<int:id>/like', like_paper),
     path('paper/<int:id>/collect', collect_paper),
+
     path('paper/report/create', report_paper),
     path('paper/report/page/<int:pindex>', list_paper_report),
     path('paper/delete', delete_paper),
@@ -102,6 +104,10 @@ urlpatterns = [
     path('interpretation/page/<int:pindex>', list_interpretation_page),
     path('interpretation/<int:id>/like', like_interpretation),
     path('interpretation/<int:id>/collect', collect_interpretation),
+    path('interpretation/delete', delete_interpretation),
+
+    path('interpretation/report/create', report_interpretation),
+    path('interpretation/report/page/<int:pindex>', list_interpretation_report),
 
     # search apis
     path('search/page/<int:pindex>', search_by_tag),

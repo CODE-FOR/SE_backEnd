@@ -46,6 +46,7 @@ class Paper(models.Model):
     # topic_list = models.ManyToManyField(to=Topic, related_name='topic_to_paper')
     tag_list = models.ManyToManyField(to=Tag, related_name='tag_to_paper')
     is_deleted = models.BooleanField(default=False)
+    delete_reason = models.CharField(default='', max_length=128)
     is_up = models.BooleanField(default=False)
 
     like_list = models.ManyToManyField(to='User', related_name='like_paper')
@@ -88,14 +89,21 @@ class Paper(models.Model):
     def be_reported(self, user, reason):
         new_report = Paper_report()
         new_report.reason = reason
-        new_report.paperid = self
+        new_report.paper_id = self
         new_report.created_by = user
         new_report.save()
         return new_report.pk
 
     def safe_delete(self, reason):
+        if self.is_up:
+            return
+
         self.is_deleted = True
+        self.delete_reason = reason
+        self.save()
         # delete interpretation
+        for interpret in self.related_interpretation.all():
+            interpret.safe_delete('所属论文被删除，删除原因：' + reason)
 
     def to_hash(self, user):
         if hasattr(user, 'id'):
@@ -138,7 +146,7 @@ def get_paper_by_id(pid):
 # 获取论文标题和id，供列表用
 def get_paper_title_and_id():
     re = []
-    papers = Paper.objects.all()
+    papers = Paper.objects.filter(is_deleted=False)
     for paper in papers:
         rst = dict()
         rst.update({
@@ -151,7 +159,7 @@ def get_paper_title_and_id():
 
 # 按置顶+时间倒序获取paper
 def get_paper_ordered_dec():
-    papers = Paper.objects.all().order_by('-is_up', '-created_at')
+    papers = Paper.objects.filter(is_deleted=False).order_by('-is_up', '-created_at')
     '''
     if tags:
         for tag_str in tags:
@@ -174,10 +182,12 @@ class Paper_author(models.Model):
 
 class Paper_report(models.Model):
     report_id = models.IntegerField(primary_key=True, auto_created=True)
-    paperid = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='reports')
+    paper_id = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='reports')
     reason = models.CharField(max_length=512)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_paper')
+
+    is_solved = models.BooleanField(default=False)
 
     def to_hash(self, user):
         rst = dict()
@@ -186,9 +196,10 @@ class Paper_report(models.Model):
             "created_by": self.created_by.to_hash(),
             "reason": self.reason,
             "created_at": self.created_at,
-            "paper": self.paperid.to_hash(user),
+            "paper": self.paper_id.pk,
         })
         return rst
 
-def get_all_report():
-    pass
+def get_all_paper_report():
+    reports = Paper_report.objects.all().order_by('-created_at')
+    return reports

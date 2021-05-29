@@ -95,23 +95,8 @@ def delete_comment(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Knowledge ID.")
     if comment.user.id != user.id:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Wrong user ID")
-    comment.delete()
+    comment.safe_delete()
     return success_api_response({'id': comment_id})
-
-
-def comment2json(comment: Comment) -> dict:
-    data: dict = {'id': comment.id,
-                  'username': comment.user.username,
-                  'user_id': comment.user.id,
-                  'created_at': comment.created_at,
-                  'text': comment.text,
-                  'micro_knowledge_id': comment.interpretation.id,
-                  }
-    if comment.to_user is not None:
-        data['to_user'] = {'id': comment.to_user.id, 'username': comment.to_user.username}
-    if comment.parent_comment is not None:
-        data['parent_comment_id'] = comment.parent_comment.id
-    return data
 
 
 @jwt_auth()
@@ -132,8 +117,10 @@ def get_comment(request: HttpRequest, id: int):
     try:
         comment = Comment.objects.get(id=comment_id)
     except ObjectDoesNotExist:
-        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Knowledge ID.")
-    ret_data = comment2json(comment)
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Comment ID.")
+    if comment.is_delete:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Comment ID.")
+    ret_data = comment.to_hash()
     return success_api_response(ret_data)
 
 
@@ -170,12 +157,17 @@ def get_comment_list(request: HttpRequest):
         mk = Interpretation.objects.get(pk=mk_id)
     except ObjectDoesNotExist:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid micro knowledge id.")
-    paginator = Paginator(mk.comment_list.all(), psize)
+    paginator = Paginator(mk.comment_list.filter(is_delete=False), psize)
     try:
         cp = paginator.page(pindex)
     except:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad page args.")
-    re_data = {'comment_list': [comment2json(comment) for comment in cp.object_list], 'page_count': paginator.num_pages}
+
+    comment_list = []
+    for comment in cp.object_list:
+        comment_list.append(comment.to_hash())
+
+    re_data = {'comment_list': comment_list, 'page_count': paginator.num_pages}
     return success_api_response(re_data)
     # cl = list(cp.object_list.values())
     # return success_api_response({'comment_list': cl, 'page_count': paginator.count})

@@ -1,10 +1,10 @@
-
 from django.http import HttpRequest
 from django.views.decorators.http import require_GET
 from core.api.auth import jwt_auth
 from core.api.utils import (ErrorCode, failed_api_response, parse_data,
                             response_wrapper, success_api_response)
 from core.models.user import User
+
 
 @response_wrapper
 @jwt_auth()
@@ -30,7 +30,8 @@ def get_profile(request: HttpRequest):
         'nickname': user.nick_name,
         'email': user.email,
         'institution': user.institution,
-        'total_post': user.create_paper.count() + user.create_interpretation.count(),
+        'total_post': user.create_paper.filter(is_deleted=False).count() + user.create_interpretation.filter(
+            is_deleted=False).count(),
         'total_like': total_like,
         'total_fan': user.user_set.count(),
         'is_following': user.user_set.filter(id=request.user.id).exists(),

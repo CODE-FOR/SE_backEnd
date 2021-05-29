@@ -12,7 +12,8 @@ from core.models.user import User
 from core.api.auth import jwt_auth
 from core.models.paper import Paper, get_paper_ordered_dec, get_paper_by_id
 from django.core.paginator import Paginator
-from core.models.interpretation import Interpretation, get_interpretation_ordered
+from core.models.interpretation import Interpretation, get_interpretation_ordered, get_all_interpretation_report, \
+    Interpretation_report
 
 
 # interpretation curd
@@ -81,6 +82,7 @@ def like_interpretation(request: HttpRequest, id: int):
 
     return success_api_response({})
 
+
 @response_wrapper
 @jwt_auth()
 @require_http_methods('GET')
@@ -109,6 +111,8 @@ def get_interpretation_by_id(request: HttpRequest, id: int):
     """
     p = request.user
     interpretation = Interpretation.objects.get(pk=id)
+    if interpretation.is_deleted:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Bad Interpretation ID.")
     rst = interpretation.to_hash(p)
 
     return success_api_response(rst)
@@ -146,12 +150,101 @@ def list_interpretation_page(request: HttpRequest, pindex):
         # })
         page_json.append(rst)
     return success_api_response({
-        "interpretations": page_json,   # list of interpretation
+        "interpretations": page_json,  # list of interpretation
         "has_next": interpretation.has_next(),
         "has_previous": interpretation.has_previous(),
-        "page_now": interpretation.number,    # total
+        "page_now": interpretation.number,  # total
         "page_total": paginator.num_pages,
         "interpretation_total": interpretation_num,  # total amount of inter
+    })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('POST')
+def delete_interpretation(request: HttpRequest):
+    """ delete interpretation
+    :param request:
+        interpretationId: id of paper
+        reason: reason
+    :return:
+    """
+    params = json.loads(request.body.decode())
+
+    interpretation = Interpretation.objects.get(pk=params.get("interpretationId"))
+
+    p = request.user
+
+    interpretation.safe_delete(params.get("reason"))
+
+    return success_api_response({})
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('POST')
+def report_interpretation(request: HttpRequest):
+    """
+    :param request:
+        interpretationId: interpretation id
+        reason: reason
+
+    :return:
+        report_id
+    """
+    params = json.loads(request.body.decode())
+    user = request.user
+
+    interpretation_id = params.get("interpretationId")
+    reason = params.get("reason")
+
+    interpretation = Interpretation.objects.filter(pk=interpretation_id)
+    if interpretation.exists():
+        interpretation = interpretation.first()
+    else:
+        return failed_api_response(ErrorCode.ID_NOT_EXISTS, "invalid interpretation id")
+
+    report_id = interpretation.be_reported(user, reason)
+
+    return success_api_response({
+        "id": report_id
+    })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def list_interpretation_report(request: HttpRequest, pindex):
+    """
+    get a page as order in time
+    :param request:
+        user_id: request user id
+    :param pindex: page index
+    :return:
+    """
+    params = request.GET.dict()
+
+    reports = get_all_interpretation_report()
+    report_num = Interpretation_report.objects.count()
+    p = request.user
+    if params.get('user_id'):
+        p = User.objects.get(pk=params.get('user_id'))
+    num_per_page = 5
+    if params.get('num_per_page', None):
+        num_per_page = int(params.get('num_per_page', None))
+    paginator = Paginator(reports, num_per_page)
+    report_page = paginator.page(pindex)
+    page_json = []
+    for item in report_page.object_list:
+        rst = item.to_hash(p)
+        page_json.append(rst)
+    return success_api_response({
+        "reports": page_json,
+        "has_next": report_page.has_next(),
+        "has_previous": report_page.has_previous(),
+        "number": report_page.number,  # page current
+        "page_num": paginator.num_pages,  # total pages
+        "report_num": report_num,  # total number of reports
     })
 
 

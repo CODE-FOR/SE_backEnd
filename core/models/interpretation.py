@@ -22,10 +22,19 @@ class Interpretation(models.Model):
     tag_list = models.ManyToManyField(to=Tag, related_name='tag_to_interpretation')
 
     is_deleted = models.BooleanField(default=False)
+    delete_reason = models.CharField(default='', max_length=128)
     is_up = models.BooleanField(default=False)
 
     like_list = models.ManyToManyField(to='User', related_name='like_interpretation')
     collect_list = models.ManyToManyField(to='User', related_name='collect_interpretation')
+
+    def safe_delete(self, reason):
+        self.is_deleted = True
+        self.delete_reason = reason
+        self.save()
+        # delete comment
+        for comment in self.comment_list.all():
+            comment.safe_delete()
 
     def be_liked(self, user):
         if self.like_list.filter(id=user.id):
@@ -50,6 +59,14 @@ class Interpretation(models.Model):
 
     def is_collect(self, user):
         return self.collect_list.filter(id=user).exists()
+
+    def be_reported(self, user, reason):
+        new_report = Interpretation_report()
+        new_report.reason = reason
+        new_report.interpretation_id = self
+        new_report.created_by = user
+        new_report.save()
+        return new_report.pk
 
     def to_hash(self, user):
         if hasattr(user, 'id'):
@@ -96,5 +113,31 @@ class Interpretation(models.Model):
 
 # 按置顶+时间倒序获取paper
 def get_interpretation_ordered():
-    interpretations = Interpretation.objects.all().order_by('-created_at')
+    interpretations = Interpretation.objects.filter(is_deleted=False).order_by('-created_at')
     return interpretations
+
+
+class Interpretation_report(models.Model):
+    report_id = models.IntegerField(primary_key=True, auto_created=True)
+    interpretation_id = models.ForeignKey(Interpretation, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=512)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_interpretation')
+
+    is_solved = models.BooleanField(default=False)
+
+    def to_hash(self, user):
+        rst = dict()
+        rst.update({
+            "id": self.pk,
+            "created_by": self.created_by.to_hash(),
+            "reason": self.reason,
+            "created_at": self.created_at,
+            "interpretation": self.interpretation_id.pk,
+        })
+        return rst
+
+
+def get_all_interpretation_report():
+    reports = Interpretation_report.objects.all().order_by('-created_at')
+    return reports

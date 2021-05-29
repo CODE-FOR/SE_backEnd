@@ -97,10 +97,10 @@ class User(AbstractUser):
 
     def get_post_unsorted(self, user):
         post = []
-        papers = self.create_paper.all()
+        papers = self.create_paper.filter(is_deleted=False)
         for paper in papers:
             post.append(paper.to_hash(user))
-        interpretations = self.create_interpretation.all()
+        interpretations = self.create_interpretation.filter(is_deleted=False)
         for interpretation in interpretations:
             post.append(interpretation.to_hash(user))
         return post
@@ -114,10 +114,10 @@ class User(AbstractUser):
 
     def get_collect_unsorted(self, user):
         post = []
-        papers = self.collect_paper.all()
+        papers = self.collect_paper.filter(is_deleted=False)
         for paper in papers:
             post.append(paper.to_hash(user))
-        interpretations = self.collect_interpretation.all()
+        interpretations = self.collect_interpretation.filter(is_deleted=False)
         for interpretation in interpretations:
             post.append(interpretation.to_hash(user))
         return post
