@@ -10,7 +10,6 @@ from core.models.tag import Tag, TAG, KEYWORD
 from core.models.user import User
 
 from core.api.auth import jwt_auth
-from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_report
 from django.core.paginator import Paginator
 from core.models.chat import Chat_list, Chat, get_chat_list_by_id, add_chat_list_or_update_it, get_one_message_by_id, get_all_message_by_id
 
