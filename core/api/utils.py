@@ -19,6 +19,7 @@ class ErrorCode(Enum):
     ITEM_ALREADY_EXISTS = 409
     SERVER_ERROR = 500
     ID_NOT_EXISTS = 555
+    LIMIT = 444
 
 
 def _api_response(success, data) -> dict:
