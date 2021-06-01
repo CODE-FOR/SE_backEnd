@@ -43,11 +43,10 @@ def create_paper(request: HttpRequest):
 
     limits = Paper.objects.filter(created_by=user).order_by('-created_at')
     if limits.count() >= 5:
-        limit = limits[4]
-        print(str(limit.created_at.timestamp()) + ' ' + limit.title)
-        print(time.time())
-        limit_time = limit.created_at
-        return failed_api_response(ErrorCode.LIMIT, "reach post limit in an hour")
+        limit_time = limits[4].created_at.timestamp()
+        now_time = time.time()
+        if now_time - limit_time <= 3600:
+            return failed_api_response(ErrorCode.LIMIT, "reach post limit in an hour")
 
     paper = Paper()
     paper.title = params.get("title")
