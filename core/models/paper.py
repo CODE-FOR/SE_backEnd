@@ -196,7 +196,7 @@ class Paper_report(models.Model):
             "created_by": self.created_by.to_hash(),
             "reason": self.reason,
             "created_at": self.created_at,
-            "paper": self.paper_id.pk,
+            "paper": self.paper_id.to_hash(user),
         })
         return rst
 
