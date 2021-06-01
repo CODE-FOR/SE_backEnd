@@ -13,6 +13,7 @@ from core.api.auth import jwt_auth
 from core.models.paper import Paper, get_paper_ordered_dec, get_paper_title_and_id, Paper_report, get_all_paper_report
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation
+import time
 
 
 # paper curd
@@ -43,7 +44,9 @@ def create_paper(request: HttpRequest):
     limits = Paper.objects.filter(created_by=user).order_by('-created_at')
     if limits.count() >= 5:
         limit = limits[4]
-        print(str(limit.pk) + ' ' + limit.title)
+        print(str(limit.created_at.timestamp()) + ' ' + limit.title)
+        print(time.time())
+        limit_time = limit.created_at
         return failed_api_response(ErrorCode.LIMIT, "reach post limit in an hour")
 
     paper = Paper()
