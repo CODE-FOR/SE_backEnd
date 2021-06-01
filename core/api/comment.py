@@ -1,3 +1,5 @@
+import time
+
 from django.http import HttpRequest
 from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,6 +36,14 @@ def create_comment(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid request args.")
 
     user: User = request.user
+
+    limits = Comment.objects.filter(user=user).order_by('-created_at')
+    if limits.count() >= 20:
+        limit_time = limits[19].created_at.timestamp()
+        now_time = time.time()
+        if now_time - limit_time <= 3600:
+            return failed_api_response(ErrorCode.LIMIT, "reach post limit in an hour")
+
     knowledge_id = data.get('micro_knowledge_id')
     content = data.get('content')
     tu_id = data.get('to_user_id')

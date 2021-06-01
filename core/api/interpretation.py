@@ -14,7 +14,7 @@ from core.models.paper import Paper, get_paper_ordered_dec, get_paper_by_id
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation, get_interpretation_ordered, get_all_interpretation_report, \
     Interpretation_report
-
+import time
 
 # interpretation curd
 
@@ -36,6 +36,13 @@ def create_interpretation(request: HttpRequest):
     user = request.user
     if params.get('user_id'):
         user = User.objects.get(pk=params.get('user_id'))
+
+    limits = Interpretation.objects.filter(created_by=user).order_by('-created_at')
+    if limits.count() >= 5:
+        limit_time = limits[4].created_at.timestamp()
+        now_time = time.time()
+        if now_time - limit_time <= 3600:
+            return failed_api_response(ErrorCode.LIMIT, "reach post limit in an hour")
 
     interpretation = Interpretation()
     interpretation.title = params.get("title")
