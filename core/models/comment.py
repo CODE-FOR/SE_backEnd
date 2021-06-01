@@ -30,11 +30,14 @@ class Comment(models.Model):
                       'text': self.text,
                       'micro_knowledge_id': self.interpretation.id,
                       }
+        if self.is_delete:
+            data['text'] = '该评论已删除'
         if self.to_user is not None:
             data['to_user'] = {'id': self.to_user.id, 'username': self.to_user.username}
         if self.parent_comment is not None:
             data['parent_comment_id'] = self.parent_comment.id
         return data
+
 
     def safe_delete(self):
         self.is_delete = True

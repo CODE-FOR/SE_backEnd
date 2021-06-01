@@ -157,7 +157,7 @@ def get_comment_list(request: HttpRequest):
         mk = Interpretation.objects.get(pk=mk_id)
     except ObjectDoesNotExist:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, "Invalid micro knowledge id.")
-    paginator = Paginator(mk.comment_list.filter(is_delete=False), psize)
+    paginator = Paginator(mk.comment_list.all(), psize)
     try:
         cp = paginator.page(pindex)
     except:
