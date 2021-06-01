@@ -15,4 +15,4 @@ def search_by_keyword_and_tags(cls, tags, keyword):
     for tag in tags:
         items = items & cls.objects.filter(tag_list__id__contains=tag)
 
-    return (items & cls.objects.filter(title__contains=keyword)).distinct()
+    return (items & cls.objects.filter(title__contains=keyword)).distinct().filter(is_deleted=False)
