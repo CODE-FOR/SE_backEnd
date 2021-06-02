@@ -133,7 +133,7 @@ class Interpretation_report(models.Model):
             "created_by": self.created_by.to_hash(),
             "reason": self.reason,
             "created_at": self.created_at,
-            "interpretation": self.interpretation_id.pk,
+            "interpretation": self.interpretation_id.to_hash(user),
         })
         return rst
 
