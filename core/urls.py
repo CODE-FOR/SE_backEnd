@@ -42,6 +42,8 @@ from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
 from core.api.chat import get_user_chat_by_id, clear_unread_by_id, get_chat_list, add_user_into_list, \
     get_message_list_by_id, get_message_by_id
 
+from core.api.user import ban, unban, list_user_all, list_ban_all
+
 urlpatterns = [
 
     # user apis
@@ -64,6 +66,12 @@ urlpatterns = [
     path('comment/delete', delete_comment),
     path('comment/<int:id>', get_comment),
     path('comment', get_comment_list),
+
+    # manage apis
+    path('ban/manage', ban),
+    path('unban/manage', unban),
+    path('ban-list/<int:pindex>', list_ban_all),
+    path('user-list/<int:pindex>', list_user_all),
 
     # user apis
     path('user/<int:pid>/follow', follow),

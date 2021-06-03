@@ -28,6 +28,8 @@ class User(AbstractUser):
     user_tags = models.CharField(validators=[validate_comma_separated_integer_list], max_length=70000,
                                  blank=True, null=True, default='')
 
+    is_banned = models.BooleanField(default=False)
+
     class Meta(AbstractUser.Meta):
         pass
 
@@ -45,6 +47,16 @@ class User(AbstractUser):
             "id": self.id,
             "name": self.username,
             "email": self.email,
+        })
+        return rst
+
+    def to_hash_list(self):
+        rst = dict()
+        rst.update({
+            "user_id": self.id,
+            "user_name": self.username,
+            "email": self.email,
+            "is_banned": self.is_banned
         })
         return rst
 
@@ -122,6 +134,20 @@ class User(AbstractUser):
             post.append(interpretation.to_hash(user))
         return post
 
+    def ban(self, reason):
+        if Ban.objects.filter(target=self).exists():
+            return False
+        new_record = Ban()
+        new_record.target = self
+        new_record.reason = reason
+        new_record.save()
+        return True
+
+    def unban(self):
+        items = Ban.objects.filter(target=self, valid=True)
+        for item in items:
+            item.unban()
+
 
 class ConfirmString(models.Model):
     """confirm string
@@ -134,3 +160,25 @@ class ConfirmString(models.Model):
 
     def __str__(self):
         return self.email + ":   " + self.code
+
+
+class Ban(models.Model):
+    target = models.ForeignKey(User, on_delete=models.CASCADE, related_name='banning')
+    created_at = models.DateTimeField(auto_now_add=True)
+    valid = models.BooleanField(default=True)
+    reason = models.CharField(max_length=200)
+
+    def to_hash(self):
+        rst = dict()
+        rst.update({
+            "user_id": self.target.id,
+            "user_name": self.target.username,
+            "email": self.target.email,
+            "time": self.created_at,
+            "reason": self.reason,
+        })
+        return rst
+
+    def unban(self):
+        self.valid = False
+        self.save()
