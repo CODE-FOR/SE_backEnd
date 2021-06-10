@@ -195,7 +195,7 @@ def ban(request: HttpRequest):
     user = params.get("userId")
     reason = params.get("reason")
 
-    _success = user.ban(reason)
+    _success = User.objects.get(id=user).ban(reason)
 
     if _success:
         return success_api_response({})
@@ -211,6 +211,6 @@ def unban(request: HttpRequest):
 
     user = params.get("userId")
 
-    _success = user.unban()
+    _success = User.objects.get(id=user).unban()
 
     return success_api_response({})

@@ -15,6 +15,7 @@ from core.api.utils import response_wrapper, success_api_response, failed_api_re
 from core.api.auth import jwt_auth
 from core.api.query_utils import query_page
 
+
 @response_wrapper
 @jwt_auth()
 @require_GET
@@ -38,16 +39,16 @@ def recommend(request: HttpRequest, *args, **kwargs):
     query_type = data.get('type', None)
     res = get_recommend(request.user.id, num)
     if query_type == '1':
-        models = MicroEvidence\
-            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None))\
+        models = MicroEvidence \
+            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None)) \
             .filter(pk__in=res)
     if query_type == '0':
-        models = MicroConjecture\
-            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None))\
+        models = MicroConjecture \
+            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None)) \
             .filter(pk__in=res)
     else:
-        models = MicroKnowledge\
-            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None))\
+        models = MicroKnowledge \
+            .search_by_keywords_and_tags(keywords=data.get('keywords', None), tags=data.get('tags', None)) \
             .filter(pk__in=res)
     models_all = models.count()
     page = kwargs.get('page')
@@ -108,6 +109,7 @@ def recommend(request: HttpRequest, *args, **kwargs):
     }
     return success_api_response(data)
 
+
 # @jwt_auth()
 def get_recommend(user_id: int, num: int):
     """recommend
@@ -123,7 +125,7 @@ def get_recommend(user_id: int, num: int):
     data: dict = {}
     for user in user_all:
         tags = user.user_tags[1:-1]
-        tag_favor: list = [0]*70 if tags == '' else [int(s) for s in tags.split(',')]
+        tag_favor: list = [0] * 70 if tags == '' else [int(s) for s in tags.split(',')]
         user_favor = user.favorites.all()
         micro_knowledge = list(user_favor.values_list('id', flat=True)) if user_favor else []
         data[user.id] = {
@@ -142,6 +144,7 @@ class Recommender:
     k：表示得出最相近的k的近邻
     n：表示需要推荐的物品数，如不够则随机从微知识库里挑选一些
     '''
+
     def __init__(self, users, k=3, n=10):
         self.k = k
         self.n = n
@@ -164,8 +167,8 @@ class Recommender:
         用于计算标签向量之间的距离
         x, y：标签向量
         '''
-        return np.linalg.norm(x-y)
-        
+        return np.linalg.norm(x - y)
+
     def compute_nearest_neighbor(self, username):
         distances = []
         for instance in self.users:
@@ -175,62 +178,63 @@ class Recommender:
 
         distances.sort(key=lambda tuple: tuple[1])
         return distances
-    
-    #推荐算法的主体函数
+
+    # 推荐算法的主体函数
     def recommend(self, username):
         '''
         实际的时候，可以直接使用 id
         '''
-        #存储微知识id以及对应的权重，设成字典是为了方便下面的加权重
+        # 存储微知识id以及对应的权重，设成字典是为了方便下面的加权重
         recommendations = {}
-        #计算出user与所有其他用户的相似度，返回一个list
+        # 计算出user与所有其他用户的相似度，返回一个list
         nearest = self.compute_nearest_neighbor(username)
         # print nearest
         print('nearest: ', nearest)
         user_favor = self.users[username]['micro_knowledge']
         # print userRatings
         total_distance = 0.0
-        #得住最近的k个近邻的总距离
+        # 得住最近的k个近邻的总距离
         for i in range(min(self.k, len(nearest))):
             total_distance += nearest[i][1]
         if total_distance == 0.0:
             total_distance = 1.0
-            
-        #将与user最相近的k个人中user没有看过的书推荐给user，并且这里又做了一个分数的计算排名
+
+        # 将与user最相近的k个人中user没有看过的书推荐给user，并且这里又做了一个分数的计算排名
         for i in range(min(self.k, len(nearest))):
-        #第i个人的与user的相似度，转换到[0,1]之间
-        #这个weight算得过于草率
+            # 第i个人的与user的相似度，转换到[0,1]之间
+            # 这个weight算得过于草率
             weight = 1 - nearest[i][1] / total_distance
-        
-        #第i个人的name
+
+            # 第i个人的name
             name = nearest[i][0]
-        
-        #第i个用户的发布或者收藏
+
+            # 第i个用户的发布或者收藏
             neighbor_favor = self.users[name]['micro_knowledge']
-        
+
             for knowledge in neighbor_favor:
                 if knowledge not in user_favor:
                     if knowledge not in recommendations:
-                        recommendations[knowledge] = weight # 这里的权重当前仅考虑了当前用户与邻居的相似度，之后还可以考虑 knowledge 自身的点赞数、收藏数等
+                        recommendations[knowledge] = weight  # 这里的权重当前仅考虑了当前用户与邻居的相似度，之后还可以考虑 knowledge 自身的点赞数、收藏数等
                     else:
-                        recommendations[knowledge] = (recommendations[knowledge]+ weight)
-            
-        recommendations = list(recommendations.items()) # 转化成 (id, weight) tuple 的数组
-        
-        #做了一个排序
+                        recommendations[knowledge] = (recommendations[knowledge] + weight)
+
+        recommendations = list(recommendations.items())  # 转化成 (id, weight) tuple 的数组
+
+        # 做了一个排序
         recommendations.sort(key=lambda tuple: tuple[1], reverse=True)
         recommendations = list(map(lambda tuple: tuple[0], recommendations))
         # 若推荐数目不足 n，则进行填充
         if len(recommendations) < self.n:
-        # 随机选一些微知识进行填充，如果可以的话，可以按照用户的标签向量作为依据，进行选取
-        # 这里将使用随机数进行模拟
+            # 随机选一些微知识进行填充，如果可以的话，可以按照用户的标签向量作为依据，进行选取
+            # 这里将使用随机数进行模拟
             tags_id = self.users[username]['tag_favor']
             tags_id = tags_id.tolist()
             max_index = tags_id.index(max(tags_id))
             mk = list(MicroKnowledge.objects.filter(judge_status=1).values_list('id', flat=True))
             if max_index != 0:
                 tag = Tag.objects.get(id=max_index)
-                mk = list(tag.tag_to_mk.filter(judge_status=1).values_list('id', flat=True)) if tag.tag_to_mk.all() else mk
+                mk = list(
+                    tag.tag_to_mk.filter(judge_status=1).values_list('id', flat=True)) if tag.tag_to_mk.all() else mk
             x = self.n - len(recommendations)
             if x < len(mk):
                 random_list = np.random.choice(mk, x, replace=False).tolist()
