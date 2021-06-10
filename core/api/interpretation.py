@@ -287,7 +287,7 @@ def recommend_inter(request: HttpRequest):
     for tag in tags:
         prefer[tag.pk] = 0
 
-    collect_papers = user.collect_paper
+    collect_papers = user.collect_paper.all()
     for paper in collect_papers:
         for tag in paper.tag_list.all():
             prefer[tag.pk] += PAPER_WEIGHT
