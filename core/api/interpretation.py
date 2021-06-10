@@ -233,7 +233,7 @@ def report_interpretation(request: HttpRequest):
 def cancel_report_interpretation(request: HttpRequest):
     """
     :param request:
-        reportId: report id
+        interpretationId: interpretation id
         reason: reason
 
     :return:
@@ -241,12 +241,13 @@ def cancel_report_interpretation(request: HttpRequest):
     params = json.loads(request.body.decode())
     user = request.user
 
-    report_id = params.get("reportId")
+    interpretation_id = params.get("interpretationId")
     reason = params.get("reason")
 
-    report = Interpretation_report.objects.get(pk=report_id)
+    reports = Interpretation.objects.get(pk=interpretation_id).reports.filter(is_solved=False)
 
-    report.solve()
+    for report in reports:
+        report.solve()
 
     return success_api_response({
     })
