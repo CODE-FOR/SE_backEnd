@@ -141,12 +141,16 @@ class User(AbstractUser):
         new_record.target = self
         new_record.reason = reason
         new_record.save()
+        self.is_banned = True
+        self.save()
         return True
 
     def unban(self):
         items = Ban.objects.filter(target=self, valid=True)
         for item in items:
             item.unban()
+        self.is_banned = False
+        self.save()
 
 
 class ConfirmString(models.Model):
