@@ -324,7 +324,7 @@ def recommend_inter(request: HttpRequest):
     inters = []
 
     for i in recommend:
-        inters.append(i.to_hash())
+        inters.append(i.to_hash(user))
 
     return success_api_response({
         "recommend": inters,
