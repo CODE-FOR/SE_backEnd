@@ -289,13 +289,13 @@ def recommend_inter(request: HttpRequest):
 
     collect_papers = user.collect_paper.all()
     for paper in collect_papers:
-        for tag in paper.tag_list.all():
+        for tag in paper.tag_list.filter(type=0):
             prefer[tag.pk] += PAPER_WEIGHT
 
     collect_interpretations = user.collect_interpretation
     for interpretation in collect_interpretations:
         paper = interpretation.paper
-        for tag in paper.tag_list.all():
+        for tag in paper.tag_list.filter(type=0):
             prefer[tag.pk] += INTER_WEIGHT
 
     all_inter = []
@@ -304,7 +304,7 @@ def recommend_inter(request: HttpRequest):
     for interpretation in Interpretation.objects.all():
         w = DEFAULT_WEIGHT
         paper = interpretation.paper
-        for tag in paper.tag_list.all():
+        for tag in paper.tag_list.filter(type=0):
             w += prefer[tag.pk]
         all_inter.append(interpretation)
         weight.append(w)
