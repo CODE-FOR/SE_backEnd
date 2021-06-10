@@ -14,9 +14,15 @@ from core.models.paper import Paper, get_paper_ordered_dec, get_paper_by_id
 from django.core.paginator import Paginator
 from core.models.interpretation import Interpretation, get_interpretation_ordered, get_all_interpretation_report, \
     Interpretation_report
-import time
+import time, random
+
 
 # interpretation curd
+
+
+DEFAULT_WEIGHT = 1
+PAPER_WEIGHT = 100
+INTER_WEIGHT = 50
 
 
 @response_wrapper
@@ -261,3 +267,65 @@ INTERPRETATION_API = wrapped_api({
     # 'PUT': update_micro_evidence,
     'GET': get_interpretation_by_id
 })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('GET')
+def recommend_inter(request: HttpRequest):
+    """
+    :param request:
+        None
+    :return:
+    """
+
+    user = request.user
+
+    prefer = dict()
+
+    tags = Tag.objects.filter(type=0)
+    for tag in tags:
+        prefer[tag.pk] = 0
+
+    collect_papers = user.collect_paper
+    for paper in collect_papers:
+        for tag in paper.tag_list:
+            prefer[tag.pk] += PAPER_WEIGHT
+
+    collect_interpretations = user.collect_interpretation
+    for interpretation in collect_interpretations:
+        paper = interpretation.paper
+        for tag in paper:
+            prefer[tag.pk] += INTER_WEIGHT
+
+    all_inter = []
+    weight = []
+
+    for interpretation in Interpretation.objects.all():
+        w = DEFAULT_WEIGHT
+        paper = interpretation.paper
+        for tag in paper:
+            w += prefer[tag.pk]
+        all_inter.append(interpretation)
+        weight.append(w)
+
+    recommend = []
+    num = 5
+    while num != 0:
+        t = random.randint(0, sum(weight) - 1)
+        for i, val in enumerate(weight):
+            t -= val
+            if t < 0:
+                if all_inter[i] not in recommend:
+                    recommend.append(all_inter[i])
+                    num -= 1
+                break
+
+    inters = []
+
+    for i in recommend:
+        inters.append(i.to_hash())
+
+    return success_api_response({
+        "recommend": inters,
+    })

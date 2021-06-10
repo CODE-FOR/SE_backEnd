@@ -34,7 +34,7 @@ from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_t
     like_paper, collect_paper, report_paper, list_paper_report, delete_paper
 from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
     list_interpretation_page, like_interpretation, collect_interpretation, delete_interpretation, \
-    report_interpretation, list_interpretation_report
+    report_interpretation, list_interpretation_report, recommend_inter
 from core.api.search import search_by_tag
 
 from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
@@ -163,7 +163,7 @@ urlpatterns = [
     path('discussion/<int:id>', get_discussion),
     path('discussion', get_discussion_list),
 
-    ##timeline
+    # timeline
     # path('timeline/create', create_timeline),
     # path('timeline/<int:id>', TIMELINE_API),
     # path('timeline', get_timeline_list),
@@ -174,7 +174,8 @@ urlpatterns = [
     path('project/micro-knowledge', get_project_mk_list),
 
     # test
-    path('recommend', recommend),
+    # path('recommend', recommend),
+    path('recommend', recommend_inter),
 
     # images
     path('image', IMAGE_API),
