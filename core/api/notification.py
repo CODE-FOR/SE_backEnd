@@ -132,8 +132,11 @@ def list_notifications(request: HttpRequest, pindex: int):
 
 
 NOTIFICATION_API = wrapped_api({
-    'GET': get_notifications_num,
     'POST': create_notification,
+})
+
+NOTIFICATION_NUM_API = wrapped_api({
+    'GET': get_notifications_num
 })
 
 NOTIFICATION_SET_API = wrapped_api({

@@ -20,7 +20,7 @@ from core.api.fan import list_fans
 from core.api.follower import list_followers
 from core.api.user_icon import USER_ICON_API
 from core.api.user_icon import get_icon_by_id
-from core.api.notification import (NOTIFICATION_API, NOTIFICATION_SET_API)
+from core.api.notification import (NOTIFICATION_API, NOTIFICATION_SET_API, NOTIFICATION_NUM_API)
 from core.api.project import create_project, PROJECT_API, get_project_list
 from core.api.recommend import recommend
 from core.api.topic import (TOPIC_API, create_topic, get_topic_list)
@@ -144,6 +144,7 @@ urlpatterns = [
 
     # notifications
     path('notification', NOTIFICATION_API),
+    path('notification/num', NOTIFICATION_NUM_API),
     path('notification/page/<int:pindex>', NOTIFICATION_SET_API),
 
     # project
