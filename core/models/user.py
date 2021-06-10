@@ -135,7 +135,7 @@ class User(AbstractUser):
         return post
 
     def ban(self, reason):
-        if Ban.objects.filter(target=self).exists():
+        if Ban.objects.filter(target=self, valid=True).exists():
             return False
         new_record = Ban()
         new_record.target = self
