@@ -41,6 +41,9 @@ def create_paper(request: HttpRequest):
     if params.get('user_id'):
         user = User.objects.get(pk=params.get('user_id'))
 
+    if user.is_banned:
+        return failed_api_response(ErrorCode.BANNED, "user banned")
+
     limits = Paper.objects.filter(created_by=user).order_by('-created_at')
     if limits.count() >= 5:
         limit_time = limits[4].created_at.timestamp()
@@ -224,6 +227,31 @@ def get_paper_title(request: HttpRequest):
 @response_wrapper
 @jwt_auth()
 @require_http_methods('POST')
+def cancel_report_paper(request: HttpRequest):
+    """
+    :param request:
+        reportId: report id
+        reason: reason
+
+    :return:
+    """
+    params = json.loads(request.body.decode())
+    user = request.user
+
+    report_id = params.get("reportId")
+    reason = params.get("reason")
+
+    report = Paper_report.objects.get(pk=report_id)
+
+    report.solve()
+
+    return success_api_response({
+    })
+
+
+@response_wrapper
+@jwt_auth()
+@require_http_methods('POST')
 def report_paper(request: HttpRequest):
     """
     :param request:
@@ -266,7 +294,7 @@ def list_paper_report(request: HttpRequest, pindex):
     params = request.GET.dict()
 
     reports = get_all_paper_report()
-    report_num = Paper_report.objects.count()
+    report_num = Paper_report.objects.filter(paper_id__is_deleted=False).count()
     p = request.user
     if params.get('user_id'):
         p = User.objects.get(pk=params.get('user_id'))

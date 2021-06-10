@@ -137,7 +137,11 @@ class Interpretation_report(models.Model):
         })
         return rst
 
+    def solve(self):
+        self.is_solved = True
+        self.save()
+
 
 def get_all_interpretation_report():
-    reports = Interpretation_report.objects.all().order_by('-created_at')
+    reports = Interpretation_report.objects.filter(interpretation_id__is_deleted=False, is_solved=False).order_by('-created_at')
     return reports

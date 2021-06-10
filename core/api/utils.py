@@ -20,6 +20,7 @@ class ErrorCode(Enum):
     SERVER_ERROR = 500
     ID_NOT_EXISTS = 555
     LIMIT = 444
+    BANNED = 567
 
 
 def _api_response(success, data) -> dict:

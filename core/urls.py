@@ -31,10 +31,10 @@ from core.api.project_mk import (PROJECT_MK_API, create_project_mk, get_project_
 from core.api.word_cloud import word_cloud
 
 from core.api.paper import create_paper, PAPER_API, list_paper_page, get_paper_title, \
-    like_paper, collect_paper, report_paper, list_paper_report, delete_paper
+    like_paper, collect_paper, report_paper, list_paper_report, delete_paper, cancel_report_paper
 from core.api.interpretation import create_interpretation, INTERPRETATION_API, \
     list_interpretation_page, like_interpretation, collect_interpretation, delete_interpretation, \
-    report_interpretation, list_interpretation_report, recommend_inter
+    report_interpretation, list_interpretation_report, recommend_inter, cancel_report_interpretation
 from core.api.search import search_by_tag
 
 from core.api.post import follow_recent, get_post_by_id, get_collect_by_id
@@ -105,6 +105,7 @@ urlpatterns = [
     path('paper/report/create', report_paper),
     path('paper/report/page/<int:pindex>', list_paper_report),
     path('paper/delete', delete_paper),
+    path('paper/report/cancel', cancel_report_paper),
 
     # interpretation apis
     path('interpretation/create', create_interpretation),
@@ -116,6 +117,7 @@ urlpatterns = [
 
     path('interpretation/report/create', report_interpretation),
     path('interpretation/report/page/<int:pindex>', list_interpretation_report),
+    path('interpretation/report/cancel', cancel_report_interpretation),
 
     # search apis
     path('search/page/<int:pindex>', search_by_tag),

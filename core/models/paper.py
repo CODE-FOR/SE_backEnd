@@ -200,6 +200,11 @@ class Paper_report(models.Model):
         })
         return rst
 
+    def solve(self):
+        self.is_solved = True
+        self.save()
+
+
 def get_all_paper_report():
-    reports = Paper_report.objects.all().order_by('-created_at')
+    reports = Paper_report.objects.filter(paper_id__is_deleted=False, is_solved=False).order_by('-created_at')
     return reports

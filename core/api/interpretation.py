@@ -43,6 +43,9 @@ def create_interpretation(request: HttpRequest):
     if params.get('user_id'):
         user = User.objects.get(pk=params.get('user_id'))
 
+    if user.is_banned:
+        return failed_api_response(ErrorCode.BANNED, "user banned")
+
     limits = Interpretation.objects.filter(created_by=user).order_by('-created_at')
     if limits.count() >= 5:
         limit_time = limits[4].created_at.timestamp()
@@ -226,6 +229,31 @@ def report_interpretation(request: HttpRequest):
 
 @response_wrapper
 @jwt_auth()
+@require_http_methods('POST')
+def cancel_report_interpretation(request: HttpRequest):
+    """
+    :param request:
+        reportId: report id
+        reason: reason
+
+    :return:
+    """
+    params = json.loads(request.body.decode())
+    user = request.user
+
+    report_id = params.get("reportId")
+    reason = params.get("reason")
+
+    report = Interpretation_report.objects.get(pk=report_id)
+
+    report.solve()
+
+    return success_api_response({
+    })
+
+
+@response_wrapper
+@jwt_auth()
 @require_http_methods('GET')
 def list_interpretation_report(request: HttpRequest, pindex):
     """
@@ -238,7 +266,7 @@ def list_interpretation_report(request: HttpRequest, pindex):
     params = request.GET.dict()
 
     reports = get_all_interpretation_report()
-    report_num = Interpretation_report.objects.count()
+    report_num = Interpretation_report.objects.filter(interpretation_id__is_deleted=False).count()
     p = request.user
     if params.get('user_id'):
         p = User.objects.get(pk=params.get('user_id'))
@@ -301,7 +329,7 @@ def recommend_inter(request: HttpRequest):
     all_inter = []
     weight = []
 
-    for interpretation in Interpretation.objects.all():
+    for interpretation in Interpretation.objects.filter(is_deleted=False):
         w = DEFAULT_WEIGHT
         paper = interpretation.paper
         for tag in paper.tag_list.filter(type=0):
