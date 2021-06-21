@@ -1,7 +1,6 @@
 """micro evidence
 """
 from django.db import models
-from .micro_knowledge import MicroKnowledge, MICRO_EVIDENCE
 from .paper import Paper
 from .user import User
 from .tag import Tag
