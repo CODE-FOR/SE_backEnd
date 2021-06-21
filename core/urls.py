@@ -8,14 +8,12 @@ from core.api.profile import get_profile
 from core.api.sign_up import change_password, CREATE_USER_API, FORGET_PASSWORD_API
 from core.api.comment import create_comment, delete_comment, get_comment, get_comment_list
 
-from core.api.user import follow, unfollow, list_follower_recent
+from core.api.user import follow, unfollow
 
 from core.api.tag import TAG_SET_API
 
 from core.api.fan import list_fans
 from core.api.follower import list_followers
-
-from core.api.notification import (NOTIFICATION_API, NOTIFICATION_SET_API, NOTIFICATION_NUM_API)
 
 from core.api.image import (IMAGE_API, IMAGE_SET_API)
 
@@ -64,7 +62,6 @@ urlpatterns = [
     # user apis
     path('user/<int:pid>/follow', follow),
     path('user/<int:pid>/unfollow', unfollow),
-    path('recent/page/<int:pindex>', list_follower_recent),
 
     # chat apis
     path('chat-user-list', get_chat_list),
