@@ -22,7 +22,7 @@ class User(AbstractUser):
     icon = models.ImageField(upload_to="images/%Y%m/%d/icons", default=lyf)
 
     followers = models.ManyToManyField('User')
-    favorites = models.ManyToManyField('MicroKnowledge', related_name='favorites')
+    # favorites = models.ManyToManyField('MicroKnowledge', related_name='favorites')
     is_confirmed = models.BooleanField(default=False)
     is_sponsor = models.BooleanField(default=False, null=True)
     user_tags = models.CharField(validators=[validate_comma_separated_integer_list], max_length=70000,

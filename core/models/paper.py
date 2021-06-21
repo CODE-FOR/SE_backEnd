@@ -2,7 +2,6 @@
 """
 from django.db import models
 from .tag import Tag
-from .topic import Topic
 from .user import User
 
 FAILED = -1
