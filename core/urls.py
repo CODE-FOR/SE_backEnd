@@ -108,11 +108,6 @@ urlpatterns = [
     # list follower
     path('follower/<int:uid>', list_followers),
 
-    # notifications
-    path('notification', NOTIFICATION_API),
-    path('notification/num', NOTIFICATION_NUM_API),
-    path('notification/page/<int:pindex>', NOTIFICATION_SET_API),
-
     # timeline
     # path('timeline/create', create_timeline),
     # path('timeline/<int:id>', TIMELINE_API),
