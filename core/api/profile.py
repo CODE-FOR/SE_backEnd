@@ -18,10 +18,9 @@ def get_profile(request: HttpRequest):
             if User.objects.filter(pk=user_id).exists() is False:
                 return failed_api_response(ErrorCode.INVALID_REQUEST_ARGS, 'User is not exist')
             user = User.objects.get(pk=user_id)
-    all_post = user.created_by.all().distinct()
+
     total_like = 0
-    for post in all_post:
-        total_like += post.like_list.count()
+
     data = {
         'id': user.id,
         'username': user.username,
